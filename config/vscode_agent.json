@@ -1,0 +1,67 @@
+{
+  "name": "Joy of Movement Content Agent",
+  "description": "Autonomous agent for managing the AI content creation pipeline for The Joy of Movement",
+  "version": "1.0.0",
+  "tools": {
+    "bash": {
+      "enabled": true,
+      "allowed_commands": [
+        "python src/content_pipeline.py",
+        "python src/document_processor.py",
+        "python src/prompt_templates.py",
+        "python src/llm_integration.py",
+        "python src/main.py",
+        "ls -la",
+        "git status",
+        "git log"
+      ]
+    },
+    "file_operations": {
+      "enabled": true,
+      "allowed_paths": [
+        "src/",
+        "knowledge_base/",
+        "output/",
+        "templates/",
+        ".env"
+      ]
+    },
+    "llm_integration": {
+      "enabled": true,
+      "model": "claude-haiku-4-5-20251001",
+      "max_tokens": 2000
+    }
+  },
+  "capabilities": {
+    "pipeline_orchestration": "Run the full content generation pipeline",
+    "knowledge_base_management": "Load and monitor knowledge base documents",
+    "prompt_template_management": "Manage and test prompt templates",
+    "content_generation": "Generate social media, blog, and newsletter content",
+    "output_management": "Organize and manage generated output files",
+    "iteration_support": "Refine content based on feedback"
+  },
+  "constraints": {
+    "max_iterations": 3,
+    "require_human_approval": true,
+    "auto_save_output": true,
+    "log_all_generations": true
+  },
+  "environment": {
+    "python_version": "3.13+",
+    "virtual_env": "venv/",
+    "api_key_source": ".env"
+  },
+  "commands": {
+    "generate_social_media": "python src/content_pipeline.py --type social_media --topic '{topic}'",
+    "generate_blog": "python src/content_pipeline.py --type blog --topic '{topic}'",
+    "generate_newsletter": "python src/content_pipeline.py --type newsletter --topic '{topic}'",
+    "check_knowledge_base": "python src/document_processor.py",
+    "test_pipeline": "python src/content_pipeline.py",
+    "interactive_mode": "python src/main.py"
+  },
+  "prompts": {
+    "system": "You are an AI content creation agent for The Joy of Movement, a German community brand for people 55+. Your role is to:\n1. Generate authentic, brand-consistent content\n2. Manage the knowledge base and pipeline\n3. Iterate on content based on feedback\n4. Maintain high quality standards\n\nAlways prioritize brand voice consistency and community belonging over generic fitness messaging.",
+    "task_confirmation": "Before executing any content generation, confirm the topic, format, and template type with the user.",
+    "quality_check": "Review all generated content for:\n- Brand voice consistency\n- Emotional authenticity\n- Community focus (not just fitness)\n- Competitor differentiation"
+  }
+}
