@@ -66,7 +66,7 @@ joy-of-movement-content-creator/
 ├── .env                        # API keys (not committed)
 └── README.md
 ```
-
+## Screenshots of Trello Board see https://docs.google.com/document/d/1xAOdqOdUfGCT2SaZ76H7iPdJ5kPB0T13A5ziOojm-Mo/edit?usp=sharing
 ---
 
 ## Setup
@@ -229,7 +229,6 @@ output/
 ├── 20250503_143512_blog_post_Why_community_matters_more.txt
 └── 20250503_144001_comparison_uniqueness_comparison.txt
 ```
-
 ---
 
 ## Key Design Decisions
