@@ -1,0 +1,254 @@
+# The Joy of Movement – AI Content Creator
+
+An AI-powered content creation system for **The Joy of Movement** — a German
+community brand for people 55+. Built with Python and the Anthropic Claude API.
+
+> "We don't build courses. We give people a new answer to the question:
+> Who am I now — and with whom?"
+
+---
+
+## What This System Does
+
+Takes brand documents and market research as input.
+Produces authentic, identity-driven content as output.
+Demonstrably different from generic AI-generated content.
+
+**Content types:** Social media posts · Blog posts · Newsletters
+
+**Pipeline:** Document → Monitor → Brief → Publish → Iterate
+
+---
+
+## Why It's Not AI-Slop
+
+Generic ChatGPT output:
+> "It's never too late to start your fitness journey! Join us and discover
+> the power of movement! 💪 #ActiveAging #FitnessOver60"
+
+This system's output:
+> "Klaus turned 60 last month. For the first time in 40 years, nobody needed
+> him to be anything. No job title. No role. Now there's a Tuesday.
+> Eight people. The same eight people. They know when he's not there."
+
+The difference is structural. Generic prompts produce generic outputs.
+This system injects brand voice, competitor contrast, and market context
+directly into every prompt — making replication without the knowledge base
+impossible.
+
+---
+
+## Project Structure
+
+```
+joy-of-movement-content-creator/
+├── src/
+│   ├── document_processor.py   # Markdown ingestion and parsing
+│   ├── knowledge_base.py       # KB management wrapper
+│   ├── prompt_templates.py     # 3 prompt templates (Brand / Industry / Hybrid)
+│   ├── content_pipeline.py     # Full pipeline orchestration
+│   ├── llm_integration.py      # Anthropic Claude API integration
+│   └── main.py                 # Interactive CLI entry point
+├── knowledge_base/
+│   ├── primary/                # Company-specific documents
+│   │   ├── brand_guidelines.md
+│   │   ├── product_specs.md
+│   │   └── past_content/
+│   │       └── example_post.md
+│   └── secondary/              # Industry research
+│       ├── market_trends.md
+│       └── competitor_analysis.md
+├── output/                     # Generated content (auto-created)
+├── templates/                  # Prompt template files
+├── config/
+│   └── vscode_agent.json       # VSCode agent configuration
+├── requirements.txt
+├── .env                        # API keys (not committed)
+└── README.md
+```
+
+---
+
+## Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/miraraab/the-joy-of-movement-content-creator.git
+cd joy-of-movement-content-creator
+```
+
+### 2. Create and activate virtual environment
+
+```bash
+python -m venv venv
+source venv/bin/activate        # macOS / Linux
+# venv\Scripts\activate         # Windows
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Set up your API key
+
+Create a `.env` file in the project root:
+
+```
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+```
+
+Get your key at: https://console.anthropic.com
+
+---
+
+## Usage
+
+### Interactive CLI (recommended for demos)
+
+```bash
+python src/main.py
+```
+
+Menu options:
+- `1` → Generate a Social Media Post
+- `2` → Generate a Blog Post
+- `3` → Generate a Newsletter
+- `4` → Run uniqueness comparison (your system vs generic ChatGPT)
+- `5` → Exit
+
+### Run individual pipeline components
+
+```bash
+# Test document processing only
+python src/document_processor.py
+
+# Test prompt template assembly
+python src/prompt_templates.py
+
+# Test full pipeline (one run, no menu)
+python src/content_pipeline.py
+
+# Test LLM integration end-to-end
+python src/llm_integration.py
+```
+
+---
+
+## The Two Knowledge Bases
+
+### Primary Knowledge Base (`knowledge_base/primary/`)
+
+Company-specific documents that ensure brand consistency:
+
+| File | Purpose |
+|---|---|
+| `brand_guidelines.md` | Voice, tone, identity language, what never to say |
+| `product_specs.md` | Membership tiers, §20 integration, retreat formats |
+| `past_content/example_post.md` | Annotated examples of on-brand writing |
+
+### Secondary Research Layer (`knowledge_base/secondary/`)
+
+Market context that grounds content in real dynamics:
+
+| File | Purpose |
+|---|---|
+| `market_trends.md` | German 55+ market, Silver Economy, cultural shifts |
+| `competitor_analysis.md` | Sportverein, VHS, studios — gaps and contrasts |
+
+---
+
+## The Three Prompt Templates
+
+| Template | Knowledge Base | Best For |
+|---|---|---|
+| `BRAND` | Primary only | Brand-consistent content, daily posts |
+| `INDUSTRY` | Secondary only | Market-aware positioning content |
+| `HYBRID` | Both KBs | Demo content, highest differentiation |
+
+The **HYBRID** template is the uniqueness engine. It requires simultaneous
+knowledge of the brand voice AND the competitor landscape — structurally
+impossible to replicate with a generic prompt.
+
+---
+
+## Hivemind Strategies Implemented
+
+**1. Human in the Loop**
+The `stage_iterate()` method in the pipeline accepts feedback and regenerates.
+Every output can be refined before saving.
+
+**2. Style Variation**
+Three templates × three content types = nine distinct generation modes.
+Each template enforces different structural constraints.
+
+**3. Contextual Placement**
+Every prompt injects specific brand context: membership tiers, opening ritual,
+identity language, competitor positioning. Generic prompts cannot produce this.
+
+**4. Iterative Prompt Engineering**
+Templates are versioned and documented. What works is encoded.
+What doesn't is excluded by explicit NEVER rules in the system prompt.
+
+---
+
+## Content Pipeline Stages
+
+```
+Document  → Load and parse markdown from both knowledge bases
+Monitor   → Report on loaded documents and token estimates
+Brief     → Define topic, format, template, key message
+Publish   → Generate content via Claude API
+Iterate   → Refine based on human feedback (loop as needed)
+```
+
+---
+
+## Technical Stack
+
+| Component | Technology |
+|---|---|
+| Language | Python 3.8+ |
+| LLM | Anthropic Claude (claude-sonnet-4-20250514) |
+| Document processing | `markdown` library + custom HTML stripper |
+| Environment | `python-dotenv` |
+| Version control | Git / GitHub |
+| Development | VSCode with agent configuration |
+
+---
+
+## Generated Output
+
+All generated content is saved automatically to `output/` with timestamps:
+
+```
+output/
+├── 20250503_143022_social_media_Starting_something_new.txt
+├── 20250503_143512_blog_post_Why_community_matters_more.txt
+└── 20250503_144001_comparison_uniqueness_comparison.txt
+```
+
+---
+
+## Key Design Decisions
+
+**No RAG, no vector store.** This project implements the RAG concept using
+markdown files and prompt context injection. Documents are read, parsed, and
+concatenated directly into prompts. This is simpler, faster, and sufficient
+for demonstrating the core idea.
+
+**English content output.** Brand language is English. Codebase is English.
+Knowledge base documents are English. German content generation is possible
+by modifying the system prompt language instruction.
+
+**Anthropic Claude over OpenAI.** Claude's instruction-following for brand
+voice constraints is more consistent. The NEVER rules in system prompts are
+respected reliably across content types.
+
+---
+
+## License
+
+Built as a school project for Ironhack. Not for commercial use.
