@@ -50,11 +50,13 @@ ALWAYS:
 - Use identity language: "you are a Mover", not "you attend our classes"
 
 NEVER:
-- Use "seniors", "anti-aging", "optimize", "train harder"
+- Use "seniors", "anti-aging", "optimize", "train harder", "journey", "embrace", "best years", "incredible benefits"
 - Write medical or clinical framing
-- Use generic motivational phrases ("unleash your potential", "transform yourself")
+- Use generic motivational phrases ("unleash your potential", "transform yourself", "live your best life")
 - Reference competitors by name
 - Sound like a fitness brand or a healthcare provider
+- Use call-to-action language ("Join us!", "Start today!", "Sign up now!")
+- Write about "staying young" or "fighting age"
 
 The brand voice: warm and direct. Like a trusted friend who happens to know
 exactly what this life stage feels like — and isn't afraid to say it out loud."""
