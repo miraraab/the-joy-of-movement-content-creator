@@ -42,6 +42,13 @@ function goToStep(stepNumber) {
         stage.classList.remove('hidden');
     }
 
+    // When going to Refine step, show the score from currentContent
+    if (stepNumber === 4 && currentContent && currentContent.score) {
+        document.getElementById('refine-content').innerHTML =
+            marked(currentContent.content) || currentContent.content;
+        displayScoreInRefine(currentContent.score);
+    }
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -215,8 +222,7 @@ async function submitFeedback() {
 
         // Update score if available
         if (data.score) {
-            const scorePanel = document.querySelector('.refine-container .score-panel') || createScorePanelInRefine();
-            displayScoreInRefine(data.score, scorePanel);
+            displayScoreInRefine(data.score);
         }
 
         // Clear feedback
@@ -234,18 +240,55 @@ async function submitFeedback() {
 }
 
 // Display score in refine section
-function displayScoreInRefine(score, scorePanel) {
-    scorePanel.querySelector('#score-overall').textContent = score.overall_score.toFixed(1) + '/10';
-    scorePanel.querySelector('#score-feedback').textContent = score.feedback;
+function displayScoreInRefine(score) {
+    const scorePanel = document.getElementById('refine-score-panel');
+    const statusEl = document.getElementById('refine-score-status');
 
+    // Show the score panel
+    scorePanel.classList.remove('hidden');
+
+    // Update overall score
+    document.getElementById('refine-score-overall').textContent = score.overall_score.toFixed(1) + '/10';
+
+    // Update individual metrics
+    document.getElementById('refine-score-voice-fill').style.width = (score.voice_authenticity * 10) + '%';
+    document.getElementById('refine-score-voice-value').textContent = score.voice_authenticity.toFixed(1);
+
+    document.getElementById('refine-score-constraint-fill').style.width = (score.constraint_compliance * 10) + '%';
+    document.getElementById('refine-score-constraint-value').textContent = score.constraint_compliance.toFixed(1);
+
+    document.getElementById('refine-score-identity-fill').style.width = (score.identity_clarity * 10) + '%';
+    document.getElementById('refine-score-identity-value').textContent = score.identity_clarity.toFixed(1);
+
+    document.getElementById('refine-score-story-fill').style.width = (score.story_quality * 10) + '%';
+    document.getElementById('refine-score-story-value').textContent = score.story_quality.toFixed(1);
+
+    document.getElementById('refine-score-contrast-fill').style.width = (score.competitor_contrast * 10) + '%';
+    document.getElementById('refine-score-contrast-value').textContent = score.competitor_contrast.toFixed(1);
+
+    // Update feedback
+    document.getElementById('refine-score-feedback').textContent = score.feedback;
+
+    // Threshold logic: 7/10
     if (score.overall_score < 7) {
         scorePanel.classList.add('score-below-threshold');
         scorePanel.classList.remove('score-good');
-        scorePanel.querySelector('#score-status').innerHTML = '<strong style="color: #d9534f;">Score below 7/10</strong>';
+        statusEl.innerHTML = '<strong style="color: #d9534f;">Score below 7/10 — Consider refining further</strong>';
     } else {
         scorePanel.classList.add('score-good');
         scorePanel.classList.remove('score-below-threshold');
-        scorePanel.querySelector('#score-status').innerHTML = '<strong style="color: var(--success);">Score above 7/10</strong>';
+        statusEl.innerHTML = '<strong style="color: var(--success);">Score above 7/10 — Ready to save or refine more</strong>';
+    }
+
+    // Display issues with suggestions
+    const issuesEl = document.getElementById('refine-score-issues');
+    if (score.issues && score.issues.length > 0) {
+        const issuesList = score.issues.map(issue =>
+            `<li><strong>${issue.problem}</strong><br/><em>Suggestion: ${issue.suggestion}</em></li>`
+        ).join('');
+        issuesEl.innerHTML = `<div style="margin-top: 15px;"><strong>Issues found:</strong><ul style="margin-top: 8px;">${issuesList}</ul></div>`;
+    } else {
+        issuesEl.innerHTML = '';
     }
 }
 
