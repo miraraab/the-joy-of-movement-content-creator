@@ -305,9 +305,16 @@ class ContentPipeline:
 
         from prompt_templates import SCORING_SYSTEM
 
+        user_prompt = f"""Evaluate this content:
+
+{output.generated_text}
+
+Return ONLY valid JSON (no markdown, no explanation):
+{{"voice_authenticity": 8, "constraint_compliance": 9, "identity_clarity": 7, "story_quality": 8, "competitor_contrast": 6, "overall_score": 7.6, "feedback": "Strong voice...", "issues": [{{"problem": "Issue", "suggestion": "Fix"}}]}}"""
+
         prompt = PromptResult(
             system_prompt=SCORING_SYSTEM,
-            user_prompt=f"Evaluate this content:\n\n{output.generated_text}",
+            user_prompt=user_prompt,
             template_type="scoring",
             content_type=output.content_type,
             topic=output.topic,

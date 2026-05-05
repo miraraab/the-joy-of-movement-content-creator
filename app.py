@@ -118,31 +118,13 @@ def publish():
         return jsonify({'error': 'No brief created'}), 400
 
     output = pipeline.stage_publish(brief)
-
-    # Score the generated content
-    output = pipeline.stage_score(output)
-
     session_data['current_output'] = output
-
-    score_data = None
-    if output.score:
-        score_data = {
-            'voice_authenticity': output.score.voice_authenticity,
-            'constraint_compliance': output.score.constraint_compliance,
-            'identity_clarity': output.score.identity_clarity,
-            'story_quality': output.score.story_quality,
-            'competitor_contrast': output.score.competitor_contrast,
-            'overall_score': output.score.overall_score,
-            'feedback': output.score.feedback,
-            'issues': [{'problem': issue.problem, 'suggestion': issue.suggestion} for issue in output.score.issues],
-        }
 
     return jsonify({
         'status': 'ok',
         'content': output.generated_text,
         'char_count': output.char_count,
         'iteration': output.iteration,
-        'score': score_data,
     })
 
 
@@ -159,31 +141,13 @@ def iterate():
         return jsonify({'error': 'No content to iterate'}), 400
 
     output = pipeline.stage_iterate(previous, data['feedback'])
-
-    # Score the refined content
-    output = pipeline.stage_score(output)
-
     session_data['current_output'] = output
-
-    score_data = None
-    if output.score:
-        score_data = {
-            'voice_authenticity': output.score.voice_authenticity,
-            'constraint_compliance': output.score.constraint_compliance,
-            'identity_clarity': output.score.identity_clarity,
-            'story_quality': output.score.story_quality,
-            'competitor_contrast': output.score.competitor_contrast,
-            'overall_score': output.score.overall_score,
-            'feedback': output.score.feedback,
-            'issues': [{'problem': issue.problem, 'suggestion': issue.suggestion} for issue in output.score.issues],
-        }
 
     return jsonify({
         'status': 'ok',
         'content': output.generated_text,
         'char_count': output.char_count,
         'iteration': output.iteration,
-        'score': score_data,
     })
 
 

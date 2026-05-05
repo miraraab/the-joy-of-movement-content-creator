@@ -42,11 +42,10 @@ function goToStep(stepNumber) {
         stage.classList.remove('hidden');
     }
 
-    // When going to Refine step, show the score from currentContent
-    if (stepNumber === 4 && currentContent && currentContent.score) {
+    // When going to Refine step, show the content
+    if (stepNumber === 4 && currentContent) {
         document.getElementById('refine-content').innerHTML =
             marked(currentContent.content) || currentContent.content;
-        displayScoreInRefine(currentContent.score);
     }
 
     // Scroll to top
@@ -119,72 +118,12 @@ async function publishContent() {
         document.getElementById('content-chars').textContent =
             data.char_count.toLocaleString();
 
-        // Display score if available
-        if (data.score) {
-            displayScore(data.score);
-        }
-
         loading.classList.add('hidden');
         contentDisplay.classList.remove('hidden');
 
     } catch (error) {
         console.error('Error:', error);
         loading.innerHTML = '<p style="color: red;">Error generating content. Please try again.</p>';
-    }
-}
-
-// Display score panel
-function displayScore(score) {
-    const scorePanel = document.getElementById('score-panel');
-    const statusEl = document.getElementById('score-status');
-    const overallEl = document.getElementById('score-overall');
-    const feedbackEl = document.getElementById('score-feedback');
-    const issuesEl = document.getElementById('score-issues');
-
-    // Remove hidden class to show panel
-    scorePanel.classList.remove('hidden');
-
-    // Update overall score
-    overallEl.textContent = score.overall_score.toFixed(1) + '/10';
-
-    // Update individual metrics
-    document.getElementById('score-voice-fill').style.width = (score.voice_authenticity * 10) + '%';
-    document.getElementById('score-voice-value').textContent = score.voice_authenticity.toFixed(1);
-
-    document.getElementById('score-constraint-fill').style.width = (score.constraint_compliance * 10) + '%';
-    document.getElementById('score-constraint-value').textContent = score.constraint_compliance.toFixed(1);
-
-    document.getElementById('score-identity-fill').style.width = (score.identity_clarity * 10) + '%';
-    document.getElementById('score-identity-value').textContent = score.identity_clarity.toFixed(1);
-
-    document.getElementById('score-story-fill').style.width = (score.story_quality * 10) + '%';
-    document.getElementById('score-story-value').textContent = score.story_quality.toFixed(1);
-
-    document.getElementById('score-contrast-fill').style.width = (score.competitor_contrast * 10) + '%';
-    document.getElementById('score-contrast-value').textContent = score.competitor_contrast.toFixed(1);
-
-    // Update feedback
-    feedbackEl.textContent = score.feedback;
-
-    // Threshold logic: 7/10
-    if (score.overall_score < 7) {
-        scorePanel.classList.add('score-below-threshold');
-        scorePanel.classList.remove('score-good');
-        statusEl.innerHTML = '<strong style="color: #d9534f;">Score below 7/10 — Consider refining with feedback</strong>';
-    } else {
-        scorePanel.classList.add('score-good');
-        scorePanel.classList.remove('score-below-threshold');
-        statusEl.innerHTML = '<strong style="color: var(--success);">Score above 7/10 — Ready to refine or save</strong>';
-    }
-
-    // Display issues with suggestions
-    if (score.issues && score.issues.length > 0) {
-        const issuesList = score.issues.map(issue =>
-            `<li><strong>${issue.problem}</strong><br/><em>Suggestion: ${issue.suggestion}</em></li>`
-        ).join('');
-        issuesEl.innerHTML = `<div style="margin-top: 15px;"><strong>Issues found:</strong><ul style="margin-top: 8px;">${issuesList}</ul></div>`;
-    } else {
-        issuesEl.innerHTML = '';
     }
 }
 
@@ -292,63 +231,37 @@ function displayScoreInRefine(score) {
     }
 }
 
-// Save and export
-async function saveAndExport() {
-    const topic = document.querySelector('#brief-form [name="topic"]').value || 'content';
+// Copy content to clipboard
+function copyToClipboard() {
+    const content = currentContent.content;
 
-    try {
-        // Save as text
-        const saveResponse = await fetch('/api/save-text', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ topic }),
-        });
-
-        if (!saveResponse.ok) throw new Error('Failed to save');
-
-        // Export as HTML
-        const htmlResponse = await fetch('/api/export-html', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!htmlResponse.ok) throw new Error('Failed to export HTML');
-
-        const htmlData = await htmlResponse.json();
-
-        // Show success
+    navigator.clipboard.writeText(content).then(() => {
+        showNotification('✓ Content copied to clipboard!');
         goToStep(5); // success stage
-
-        // Open HTML (optional)
-        setTimeout(() => {
-            if (confirm('Content saved! Would you like to open the HTML file in your browser?')) {
-                // Note: Client-side can't open local files. User must open manually.
-                alert(`HTML saved to: ${htmlData.html_path}\n\nOpen it in your browser to view.`);
-            }
-        }, 500);
-
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error saving content. Please try again.');
-    }
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy to clipboard. Please try again.');
+    });
 }
 
-// Export as HTML
-async function exportAsHTML() {
-    try {
-        const response = await fetch('/api/export-html', {
-            method: 'POST',
-        });
+// Download content as TXT
+function downloadAsText() {
+    const topic = document.querySelector('#brief-form [name="topic"]').value || 'content';
+    const content = currentContent.content;
 
-        if (!response.ok) throw new Error('Failed to export');
+    // Create blob and download
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${topic.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
 
-        const data = await response.json();
-        alert(`HTML exported to: ${data.html_path}`);
-
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error exporting HTML.');
-    }
+    showNotification('✓ Content downloaded!');
+    goToStep(5); // success stage
 }
 
 // Start new content
