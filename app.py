@@ -85,12 +85,20 @@ def create_brief():
         'hybrid': TemplateType.HYBRID,
     }
 
+    # Map format to desired_versions (only generate selected format)
+    version_map = {
+        'blog': ['blog_post'],
+        'social': ['social_media'],
+        'newsletter': ['newsletter'],
+    }
+
     brief = pipeline.stage_brief(
         topic=data['topic'],
         content_type=format_map[data['format']],
         template_type=template_map[data['template']],
         key_message=data.get('key_message', ''),
         notes=data.get('notes', ''),
+        desired_versions=version_map[data['format']],
     )
 
     session_data['brief'] = brief
