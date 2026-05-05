@@ -266,9 +266,6 @@ class ContentPipeline:
         print("-" * 60)
         print(f"[OK] {output.char_count} chars generated.")
 
-        # Auto-export to HTML after every generation
-        self.export_html(output)
-
         return output
 
     # ------------------------------------------------------------------
@@ -283,6 +280,7 @@ class ContentPipeline:
         """
         Refine content based on feedback.
         Appends feedback to the prompt and regenerates.
+        Maintains the same content versions as the previous iteration.
         """
         print("\n" + "=" * 60)
         print("STAGE 5: ITERATE")
@@ -294,6 +292,7 @@ class ContentPipeline:
             content_type=previous.brief.content_type,
             template_type=previous.brief.template_type,
             key_message=previous.brief.key_message,
+            desired_versions=previous.brief.desired_versions,  # Keep same versions!
             notes=(
                 f"PREVIOUS VERSION:\n{previous.generated_text}\n\n"
                 f"FEEDBACK TO INCORPORATE:\n{feedback}\n\n"
@@ -717,33 +716,9 @@ class ContentPipeline:
 
 
 # ---------------------------------------------------------------------------
-# Quick test
+# Note: Use main.py for interactive CLI
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    pipeline = ContentPipeline(kb_root="knowledge_base")
-
-    output = pipeline.run(
-        topic="Why community matters more than fitness after 60",
-        content_type=ContentType.SOCIAL_MEDIA,
-        template_type=TemplateType.HYBRID,
-        key_message="Belonging is the product, movement is the vehicle",
-    )
-
-    # Optional: add comparison for uniqueness demo
-    pipeline.export_html(
-        output,
-        generic_comparison=(
-            "It's never too late to start your fitness journey! "
-            "Join our community and discover the joy of staying active at any age. "
-            "💪 #ActiveAging #FitnessOver60 #HealthyLifestyle"
-        ),
-    )
-
-    print(f"\n[PIPELINE COMPLETE]")
-    print(f"Topic:     {output.topic}")
-    print(f"Format:    {output.content_type}")
-    print(f"Template:  {output.template_type}")
-    print(f"Chars:     {output.char_count}")
-    print(f"Iteration: {output.iteration}")
-    print(f"\nOpen your output: open output/content_output.html")
+    print("Use: python src/main.py")
+    print("This module is meant to be imported, not run directly.")
