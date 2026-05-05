@@ -9,6 +9,7 @@ Each stage is explicit and can be run independently or as a full pipeline.
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from document_processor import DocumentProcessor
@@ -213,6 +214,9 @@ class ContentPipeline:
         print("-" * 60)
         print(f"[OK] {output.char_count} chars generated.")
 
+        # Auto-export to HTML after every generation
+        self.export_html(output)
+
         return output
 
     # ------------------------------------------------------------------
@@ -233,7 +237,6 @@ class ContentPipeline:
         print("=" * 60)
         print(f"Feedback: {feedback}")
 
-        # Add feedback to notes for next iteration
         refined_brief = ContentBrief(
             topic=previous.brief.topic,
             content_type=previous.brief.content_type,
@@ -252,6 +255,214 @@ class ContentPipeline:
 
         print(f"[OK] Iteration {output.iteration} complete.")
         return output
+
+    # ------------------------------------------------------------------
+    # HTML Export (CEO-ready presentation output)
+    # ------------------------------------------------------------------
+
+    def export_html(
+        self,
+        output: ContentOutput,
+        filepath: str = "output/content_output.html",
+        generic_comparison: str = "",
+    ) -> str:
+        """
+        Export generated content as a styled HTML file.
+        Opens cleanly in any browser – no frameworks, no dependencies.
+
+        Args:
+            output:              ContentOutput from stage_publish() or stage_iterate()
+            filepath:            Where to save the HTML file
+            generic_comparison:  Optional: paste generic ChatGPT output for side-by-side
+        Returns:
+            filepath (str)
+        """
+        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+
+        # Build comparison block only if generic text is provided
+        comparison_block = ""
+        if generic_comparison:
+            comparison_block = f"""
+        <div class="section">
+            <h2>⚡ Uniqueness Comparison</h2>
+            <div class="comparison-grid">
+                <div class="comparison-box our-output">
+                    <div class="box-label">Joy of Movement AI System</div>
+                    <p>{output.generated_text.replace(chr(10), '<br>')}</p>
+                </div>
+                <div class="comparison-box generic-output">
+                    <div class="box-label">Generic ChatGPT</div>
+                    <p>{generic_comparison.replace(chr(10), '<br>')}</p>
+                </div>
+            </div>
+        </div>"""
+
+        # Build KB source tags
+        primary_tags = "".join(
+            f'<span class="kb-tag primary">📄 {d.filename}</span>'
+            for d in self.kb.primary
+        )
+        secondary_tags = "".join(
+            f'<span class="kb-tag secondary">🔍 {d.filename}</span>'
+            for d in self.kb.secondary
+        )
+
+        feedback_pill = (
+            "<div class='pill'><strong>Feedback applied</strong> ✓</div>"
+            if output.feedback else ""
+        )
+
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy of Movement – Content Output</title>
+    <style>
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f4f0;
+            color: #1a1a1a;
+            padding: 40px 20px;
+        }}
+        .container {{ max-width: 900px; margin: 0 auto; }}
+
+        .header {{
+            background: #1a1a1a;
+            color: #f5f4f0;
+            padding: 32px 40px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }}
+        .header .brand {{
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 8px;
+        }}
+        .header h1 {{ font-size: 26px; font-weight: 700; margin-bottom: 6px; }}
+        .header .subtitle {{ opacity: 0.6; font-size: 14px; }}
+
+        .meta-row {{ display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }}
+        .pill {{
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: #555;
+        }}
+        .pill strong {{ color: #1a1a1a; }}
+
+        .section {{
+            background: white;
+            border-radius: 12px;
+            padding: 32px 40px;
+            margin-bottom: 20px;
+            border: 1px solid #e8e8e4;
+        }}
+        .section h2 {{
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }}
+
+        .content-text {{
+            font-size: 19px;
+            line-height: 1.8;
+            color: #1a1a1a;
+        }}
+
+        .kb-tags {{ display: flex; gap: 8px; flex-wrap: wrap; }}
+        .kb-tag {{
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+        }}
+        .kb-tag.primary {{ background: #e8f4e8; color: #2d6a2d; }}
+        .kb-tag.secondary {{ background: #e8eef8; color: #2d4a8a; }}
+
+        .comparison-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
+        .comparison-box {{
+            padding: 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.7;
+        }}
+        .box-label {{
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }}
+        .our-output {{ background: #e8f4e8; border: 1px solid #b8d8b8; }}
+        .our-output .box-label {{ color: #2d6a2d; }}
+        .generic-output {{ background: #fef9e7; border: 1px solid #d4c97a; }}
+        .generic-output .box-label {{ color: #7a6a00; }}
+
+        .footer {{
+            text-align: center;
+            color: #bbb;
+            font-size: 12px;
+            margin-top: 32px;
+        }}
+
+        @media (max-width: 640px) {{
+            .comparison-grid {{ grid-template-columns: 1fr; }}
+            .section {{ padding: 24px 20px; }}
+            .header {{ padding: 24px 20px; }}
+        }}
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <div class="brand">The Joy of Movement – AI Content System</div>
+        <h1>{output.topic}</h1>
+        <div class="subtitle">Generated {output.generated_at[:10]} · Iteration {output.iteration}</div>
+    </div>
+
+    <div class="meta-row">
+        <div class="pill"><strong>Format</strong> {output.content_type}</div>
+        <div class="pill"><strong>Template</strong> {output.template_type}</div>
+        <div class="pill"><strong>Length</strong> {output.char_count} chars</div>
+        {feedback_pill}
+    </div>
+
+    <div class="section">
+        <h2>Generated Content</h2>
+        <div class="content-text">{output.generated_text.replace(chr(10), '<br>')}</div>
+    </div>
+
+    <div class="section">
+        <h2>Knowledge Base Sources</h2>
+        <div class="kb-tags">
+            {primary_tags}
+            {secondary_tags}
+        </div>
+    </div>
+
+    {comparison_block}
+
+    <div class="footer">
+        Joy of Movement AI Content Creator · Built with Anthropic Claude
+    </div>
+
+</div>
+</body>
+</html>"""
+
+        Path(filepath).write_text(html, encoding="utf-8")
+        print(f"[OK] HTML exported → {filepath}")
+        return filepath
 
     # ------------------------------------------------------------------
     # Full pipeline (convenience method)
@@ -287,12 +498,21 @@ class ContentPipeline:
 if __name__ == "__main__":
     pipeline = ContentPipeline(kb_root="knowledge_base")
 
-    # Run full pipeline
     output = pipeline.run(
         topic="Why community matters more than fitness after 60",
         content_type=ContentType.SOCIAL_MEDIA,
         template_type=TemplateType.HYBRID,
         key_message="Belonging is the product, movement is the vehicle",
+    )
+
+    # Optional: add comparison for uniqueness demo
+    pipeline.export_html(
+        output,
+        generic_comparison=(
+            "It's never too late to start your fitness journey! "
+            "Join our community and discover the joy of staying active at any age. "
+            "💪 #ActiveAging #FitnessOver60 #HealthyLifestyle"
+        ),
     )
 
     print(f"\n[PIPELINE COMPLETE]")
@@ -301,3 +521,4 @@ if __name__ == "__main__":
     print(f"Template:  {output.template_type}")
     print(f"Chars:     {output.char_count}")
     print(f"Iteration: {output.iteration}")
+    print(f"\nOpen your output: open output/content_output.html")
