@@ -58,18 +58,41 @@ joy-of-movement-content-creator/
 │   └── secondary/              # Industry research
 │       ├── market_trends.md
 │       └── competitor_analysis.md
+├── templates/
+│   └── index.html              # Flask template (web app)
+├── static/
+│   ├── style.css               # Web app styling
+│   └── script.js               # Web app frontend logic
 ├── output/                     # Generated content (auto-created)
-├── templates/                  # Prompt template files
 ├── config/
 │   └── vscode_agent.json       # VSCode agent configuration
-├── requirements.txt
+├── app.py                      # Flask web application
+├── requirements.txt            # CLI dependencies
+├── requirements-web.txt        # Web app dependencies
 ├── .env                        # API keys (not committed)
-└── README.md
+└── README
 ```
 ## Screenshots of Trello Board see https://docs.google.com/document/d/1xAOdqOdUfGCT2SaZ76H7iPdJ5kPB0T13A5ziOojm-Mo/edit?usp=sharing
 ---
 
-## Setup
+## Quick Start (Web App)
+
+```bash
+# 1. Navigate to project
+cd /Users/miraraab/Desktop/Ironhack_Labs/joy-of-movement-content-creator
+
+# 2. Activate virtual environment
+source venv/bin/activate
+
+# 3. Start the Flask app
+python app.py
+```
+
+Then open: **http://localhost:5001**
+
+---
+
+## Full Setup
 
 ### 1. Clone the repository
 
@@ -88,6 +111,12 @@ source venv/bin/activate        # macOS / Linux
 
 ### 3. Install dependencies
 
+For web app (recommended):
+```bash
+pip install -r requirements-web.txt
+```
+
+For CLI only:
 ```bash
 pip install -r requirements.txt
 ```
@@ -106,18 +135,45 @@ Get your key at: https://console.anthropic.com
 
 ## Usage
 
-### Interactive CLI (recommended for demos)
+### Option 1: Web App (Browser Interface) — Recommended
+
+Start the Flask web application:
+
+```bash
+python app.py
+```
+
+Then open your browser to:
+```
+http://localhost:5001
+```
+
+**Features:**
+- Step 1: **Prepare** — View knowledge base status
+- Step 2: **Brief** — Choose topic, format (Blog/Social/Newsletter), template (Brand/Industry/Hybrid), key message
+- Step 3: **Create** — AI generates content based on your brief
+- Step 4: **Refine** — Give feedback and iterate, or save & export
+- Step 5: **Done** — Download as HTML or start new content
+
+The web interface uses the same pipeline as the CLI, with a warm, accessible design for 55+ audience.
+
+**Dependencies:** Install with `pip install -r requirements-web.txt`
+
+---
+
+### Option 2: Interactive CLI
 
 ```bash
 python src/main.py
 ```
 
 Menu options:
-- `1` → Generate a Social Media Post
-- `2` → Generate a Blog Post
-- `3` → Generate a Newsletter
-- `4` → Run uniqueness comparison (your system vs generic ChatGPT)
-- `5` → Exit
+- Choose topic, format, template, key message
+- Generate content
+- Refine with feedback (optional)
+- Export as HTML or plain text
+
+---
 
 ### Run individual pipeline components
 
@@ -211,11 +267,14 @@ Iterate   → Refine based on human feedback (loop as needed)
 | Component | Technology |
 |---|---|
 | Language | Python 3.8+ |
-| LLM | Anthropic Claude (claude-sonnet-4-20250514) |
+| LLM | Anthropic Claude (claude-haiku-4-5-20251001) |
+| Web Framework | Flask 3.1.3 |
+| Frontend | HTML5 + CSS3 + Vanilla JavaScript |
 | Document processing | `markdown` library + custom HTML stripper |
 | Environment | `python-dotenv` |
 | Version control | Git / GitHub |
 | Development | VSCode with agent configuration |
+| API | REST endpoints with JSON responses |
 
 ---
 

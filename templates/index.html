@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Joy of Movement – Content Creator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>The Joy of Movement</h1>
+                <p class="subtitle">Authentic Content for Life in Transition</p>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+            <div class="progress-steps">
+                <div class="step active" id="step-1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Prepare</div>
+                </div>
+                <div class="step" id="step-2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Brief</div>
+                </div>
+                <div class="step" id="step-3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Create</div>
+                </div>
+                <div class="step" id="step-4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Refine</div>
+                </div>
+                <div class="step" id="step-5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Done</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Step 1: Prepare (Knowledge Base Status) -->
+            <section class="stage" id="stage-1">
+                <div class="stage-header">
+                    <h2>Step 1: Prepare</h2>
+                    <p>Your knowledge base is ready</p>
+                </div>
+
+                <div class="knowledge-base-info">
+                    <div class="kb-item">
+                        <span class="kb-label">Primary Documents</span>
+                        <span class="kb-value" id="primary-docs">—</span>
+                    </div>
+                    <div class="kb-item">
+                        <span class="kb-label">Secondary Research</span>
+                        <span class="kb-value" id="secondary-docs">—</span>
+                    </div>
+                    <div class="kb-item">
+                        <span class="kb-label">Total Tokens</span>
+                        <span class="kb-value" id="total-tokens">—</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="goToStep(2)">
+                    Begin
+                </button>
+            </section>
+
+            <!-- Step 2: Brief -->
+            <section class="stage hidden" id="stage-2">
+                <div class="stage-header">
+                    <h2>Step 2: Define Your Brief</h2>
+                    <p>Choose what you want to create</p>
+                </div>
+
+                <form id="brief-form" class="form">
+                    <!-- Topic -->
+                    <div class="form-group">
+                        <label for="topic">Topic</label>
+                        <input type="text" id="topic" name="topic"
+                               placeholder="e.g., Why community matters after 60"
+                               required>
+                    </div>
+
+                    <!-- Format -->
+                    <div class="form-group">
+                        <label>Content Format</label>
+                        <div class="radio-group">
+                            <label class="radio">
+                                <input type="radio" name="format" value="blog" checked>
+                                <span>Blog Post</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="format" value="social">
+                                <span>Social Media</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="format" value="newsletter">
+                                <span>Newsletter</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Template -->
+                    <div class="form-group">
+                        <label>Knowledge Base</label>
+                        <div class="radio-group">
+                            <label class="radio">
+                                <input type="radio" name="template" value="brand">
+                                <span>Brand Only</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="template" value="industry">
+                                <span>Market Context Only</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="template" value="hybrid" checked>
+                                <span>Hybrid (Recommended)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Key Message -->
+                    <div class="form-group">
+                        <label for="key-message">Key Message <span class="optional">(optional)</span></label>
+                        <input type="text" id="key-message" name="key_message"
+                               placeholder="e.g., Belonging is the product, movement is the vehicle">
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-group">
+                        <label for="notes">Additional Notes <span class="optional">(optional)</span></label>
+                        <textarea id="notes" name="notes"
+                                  placeholder="Any special instructions..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
+                            Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="submitBrief()">
+                            Create Brief
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Step 3: Publish (Generate Content) -->
+            <section class="stage hidden" id="stage-3">
+                <div class="stage-header">
+                    <h2>Step 3: Create Content</h2>
+                    <p>Your content is being generated...</p>
+                </div>
+
+                <div class="content-container">
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Creating authentic content...</p>
+                    </div>
+
+                    <div id="content-display" class="hidden">
+                        <div class="content-meta">
+                            <span class="meta-item">
+                                <strong id="content-format">—</strong>
+                            </span>
+                            <span class="meta-item">
+                                <strong id="content-chars">—</strong> characters
+                            </span>
+                        </div>
+
+                        <div class="content-text" id="content-text">
+                            <!-- Generated content will appear here -->
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-secondary" onclick="goToStep(4)">
+                                Next: Refine
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Iterate (Refine) -->
+            <section class="stage hidden" id="stage-4">
+                <div class="stage-header">
+                    <h2>Step 4: Refine Your Content</h2>
+                    <p>Happy with it? Or would you like to improve?</p>
+                </div>
+
+                <div class="refine-container">
+                    <div class="content-text" id="refine-content">
+                        <!-- Content to refine -->
+                    </div>
+
+                    <form id="refine-form" class="form">
+                        <div class="form-group">
+                            <label for="feedback">Your Feedback</label>
+                            <textarea id="feedback" name="feedback"
+                                      placeholder="Leave blank to save as-is. Or tell us what to improve..."
+                                      rows="4"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="saveAndExport()">
+                                Save & Export
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="submitFeedback()">
+                                Refine Further
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Success -->
+            <section class="stage hidden" id="stage-success">
+                <div class="stage-header">
+                    <h2>Complete! 🎉</h2>
+                    <p>Your content is ready</p>
+                </div>
+
+                <div class="success-message">
+                    <p>Your content has been saved.</p>
+                    <div class="export-options">
+                        <button class="btn btn-primary" onclick="exportAsHTML()">
+                            Export as HTML
+                        </button>
+                        <button class="btn btn-secondary" onclick="startNewContent()">
+                            Create Another
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>The Joy of Movement – AI Content Creator</p>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
