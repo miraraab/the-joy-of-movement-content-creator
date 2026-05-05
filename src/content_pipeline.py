@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+import json
 
 from document_processor import DocumentProcessor
 from prompt_templates import PromptTemplates, PromptResult, TemplateType, ContentType
@@ -20,6 +21,26 @@ from llm_integration import LLMIntegration
 # ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
+
+@dataclass
+class ScoreIssue:
+    """Single issue with problem & improvement suggestion."""
+    problem: str
+    suggestion: str
+
+
+@dataclass
+class ContentScore:
+    """Evaluates generated content against brand criteria."""
+    voice_authenticity: float
+    constraint_compliance: float
+    identity_clarity: float
+    story_quality: float
+    competitor_contrast: float
+    overall_score: float
+    feedback: str
+    issues: list = field(default_factory=list)
+
 
 @dataclass
 class ContentBrief:
@@ -47,6 +68,7 @@ class ContentOutput:
     feedback: str = ""
     iteration: int = 1
     generated_at: str = field(default_factory=lambda: datetime.now().isoformat())
+    score: Optional[ContentScore] = None
 
     def __post_init__(self):
         self.char_count = len(self.generated_text)
@@ -265,6 +287,54 @@ class ContentPipeline:
         print(generated_text)
         print("-" * 60)
         print(f"[OK] {output.char_count} chars generated.")
+
+        return output
+
+    # ------------------------------------------------------------------
+    # Stage 4.5: Score
+    # ------------------------------------------------------------------
+
+    def stage_score(self, output: ContentOutput) -> ContentOutput:
+        """
+        Evaluate generated content against brand criteria.
+        Produces numeric scores and actionable feedback.
+        """
+        print("\n" + "=" * 60)
+        print("STAGE 4.5: SCORE")
+        print("=" * 60)
+
+        from prompt_templates import SCORING_SYSTEM
+
+        prompt = PromptResult(
+            system_prompt=SCORING_SYSTEM,
+            user_prompt=f"Evaluate this content:\n\n{output.generated_text}",
+            template_type="scoring",
+            content_type=output.content_type,
+            topic=output.topic,
+        )
+
+        score_json_str = self.llm.generate(prompt)
+
+        try:
+            score_data = json.loads(score_json_str)
+            issues = [
+                ScoreIssue(problem=issue["problem"], suggestion=issue["suggestion"])
+                for issue in score_data.get("issues", [])
+            ]
+            output.score = ContentScore(
+                voice_authenticity=score_data["voice_authenticity"],
+                constraint_compliance=score_data["constraint_compliance"],
+                identity_clarity=score_data["identity_clarity"],
+                story_quality=score_data["story_quality"],
+                competitor_contrast=score_data["competitor_contrast"],
+                overall_score=score_data["overall_score"],
+                feedback=score_data["feedback"],
+                issues=issues,
+            )
+            print(f"[OK] Score: {output.score.overall_score:.1f}/10")
+        except (json.JSONDecodeError, KeyError) as e:
+            print(f"[WARN] Scoring failed: {e}")
+            output.score = None
 
         return output
 

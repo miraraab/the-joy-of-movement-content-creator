@@ -178,6 +178,52 @@
                             <!-- Generated content will appear here -->
                         </div>
 
+                        <!-- Score Panel -->
+                        <div id="score-panel" class="score-panel hidden">
+                            <h3>Content Quality Score</h3>
+
+                            <div class="score-grid">
+                                <div class="score-item">
+                                    <span class="label">Voice Authenticity</span>
+                                    <div class="score-bar"><div class="fill" id="score-voice-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="score-voice-value">—</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="label">Constraint Compliance</span>
+                                    <div class="score-bar"><div class="fill" id="score-constraint-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="score-constraint-value">—</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="label">Identity Clarity</span>
+                                    <div class="score-bar"><div class="fill" id="score-identity-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="score-identity-value">—</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="label">Story Quality</span>
+                                    <div class="score-bar"><div class="fill" id="score-story-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="score-story-value">—</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="label">Competitor Contrast</span>
+                                    <div class="score-bar"><div class="fill" id="score-contrast-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="score-contrast-value">—</span>
+                                </div>
+                            </div>
+
+                            <div class="overall-score">
+                                Overall: <strong id="score-overall">—</strong>
+                            </div>
+
+                            <div id="score-status"></div>
+
+                            <div class="feedback-box">
+                                <strong>Feedback:</strong>
+                                <p id="score-feedback"></p>
+                            </div>
+
+                            <div class="issues-list" id="score-issues"></div>
+                        </div>
+
                         <div class="form-actions">
                             <button class="btn btn-secondary" onclick="goToStep(4)">
                                 Next: Refine

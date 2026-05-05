@@ -416,6 +416,149 @@ body {
     min-width: 180px;
 }
 
+/* ===== SCORE PANEL ===== */
+.score-panel {
+    margin: 30px 0;
+    padding: 25px;
+    background: var(--light-bg);
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.score-panel.hidden {
+    display: none;
+}
+
+.score-panel h3 {
+    margin: 0 0 15px 0;
+    color: var(--dark-text);
+    font-size: 18px;
+}
+
+.score-panel.score-below-threshold {
+    border-left-color: #d9534f;
+    background: rgba(217, 83, 79, 0.05);
+}
+
+.score-panel.score-good {
+    border-left-color: var(--success);
+    background: rgba(127, 168, 127, 0.05);
+}
+
+.score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.score-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.score-item .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--light-text);
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.score-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.score-bar .fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+
+.score-item .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.overall-score {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    text-align: center;
+    color: var(--dark-text);
+}
+
+#score-status {
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.feedback-box {
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+}
+
+.feedback-box strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--dark-text);
+}
+
+.feedback-box p {
+    margin: 0;
+    color: var(--dark-text);
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.issues-list {
+    margin: 0;
+}
+
+.issues-list strong {
+    color: var(--dark-text);
+    font-size: 14px;
+}
+
+.issues-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.issues-list li {
+    padding: 10px;
+    margin: 8px 0;
+    background: white;
+    border-left: 3px solid #d9534f;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.issues-list li strong {
+    color: #d9534f;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.issues-list li em {
+    color: var(--light-text);
+    display: block;
+    margin-top: 4px;
+    font-style: italic;
+}
+
 /* ===== FOOTER ===== */
 .footer {
     text-align: center;
