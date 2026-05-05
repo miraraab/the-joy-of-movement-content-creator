@@ -63,6 +63,35 @@ def choose_template() -> TemplateType:
     return mapping.get(choice, TemplateType.HYBRID)
 
 
+def choose_versions() -> list:
+    """Interactive menu to select which content versions to generate."""
+    print("\nWhich content versions do you want?")
+    print("  1 -> Blog Post only")
+    print("  2 -> Social Media Post only")
+    print("  3 -> Newsletter only")
+    print("  4 -> Blog Post + Social Media")
+    print("  5 -> Blog Post + Newsletter")
+    print("  6 -> Social Media + Newsletter")
+    print("  7 -> All Three (Blog Post + Social Media + Newsletter)")
+
+    choice = input("Choose [1-7]: ").strip()
+
+    version_map = {
+        "1": ["blog_post"],
+        "2": ["social_media"],
+        "3": ["newsletter"],
+        "4": ["blog_post", "social_media"],
+        "5": ["blog_post", "newsletter"],
+        "6": ["social_media", "newsletter"],
+        "7": ["blog_post", "social_media", "newsletter"],
+    }
+
+    selected = version_map.get(choice, ["blog_post", "social_media", "newsletter"])
+    version_names = [v.replace("_", " ").title() for v in selected]
+    print(f"✓ Selected: {', '.join(version_names)}")
+    return selected
+
+
 def save_output(content: str, topic: str, content_type: str) -> str:
     """Save generated content to output/ folder."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -97,7 +126,9 @@ def print_uniqueness_note():
 
 def generate_content(pipeline: ContentPipeline, content_type: ContentType):
     template = choose_template()
-    topic = input("Topic (e.g. 'Starting something new at 60'): ").strip()
+    desired_versions = choose_versions()
+
+    topic = input("\nTopic (e.g. 'Starting something new at 60'): ").strip()
     if not topic:
         topic = "Why belonging matters more than fitness after 60"
 
@@ -108,6 +139,7 @@ def generate_content(pipeline: ContentPipeline, content_type: ContentType):
         content_type=content_type,
         template_type=template,
         key_message=key_message,
+        desired_versions=desired_versions,
     )
 
     print("\nWould you like to refine this content? (y/n)")
@@ -123,13 +155,15 @@ def generate_content(pipeline: ContentPipeline, content_type: ContentType):
 
 def run_comparison(pipeline: ContentPipeline):
     print("\n--- UNIQUENESS COMPARISON ---")
-    print("Generating Joy of Movement content with full KB context...")
+    desired_versions = choose_versions()
+    print("\nGenerating Joy of Movement content with full KB context...")
 
     output = pipeline.run(
         topic="Starting something new at 60",
         content_type=ContentType.SOCIAL_MEDIA,
         template_type=TemplateType.HYBRID,
         key_message="Belonging is the product, movement is the vehicle",
+        desired_versions=desired_versions,
     )
 
     print("\n" + "=" * 60)

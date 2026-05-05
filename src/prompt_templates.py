@@ -81,7 +81,7 @@ TEMPLATE_1_USER = """PRIMARY KNOWLEDGE BASE:
 ---
 
 TASK:
-Create a {content_type} about: {topic}
+Create {versions} about: {topic}
 
 Content requirements:
 - Open with a real person's story or a concrete moment (not a statistic)
@@ -94,6 +94,8 @@ Length guidelines:
 - Blog post: 300–450 words
 - Social media: 80–120 words
 - Newsletter: 200–300 words
+
+{version_instructions}
 
 Output only the final content. No meta-commentary."""
 
@@ -121,7 +123,7 @@ TEMPLATE_2_USER = """SECONDARY RESEARCH LAYER:
 ---
 
 TASK:
-Create a {content_type} about: {topic}
+Create {versions} about: {topic}
 
 Content requirements:
 - Ground the content in real market insight (without quoting statistics)
@@ -134,6 +136,8 @@ Length guidelines:
 - Blog post: 300–450 words
 - Social media: 80–120 words
 - Newsletter: 200–300 words
+
+{version_instructions}
 
 Output only the final content. No meta-commentary."""
 
@@ -168,7 +172,7 @@ SECONDARY RESEARCH LAYER:
 ---
 
 TASK:
-Create a {content_type} about: {topic}
+Create {versions} about: {topic}
 
 Content requirements:
 - Open with a specific, human moment — not a brand statement
@@ -184,7 +188,9 @@ Length guidelines:
 - Social media: 90–130 words
 - Newsletter: 250–350 words
 
-Output only the final content. No meta-commentary."""
+{version_instructions}
+
+Output only the final content(s). No meta-commentary."""
 
 
 # ---------------------------------------------------------------------------
@@ -197,6 +203,18 @@ class PromptTemplates:
     and content parameters into the correct template.
     """
 
+    def _build_version_instructions(self, desired_versions: list) -> str:
+        """
+        Build specific instructions for which versions to generate.
+        """
+        if len(desired_versions) == 1:
+            version_name = desired_versions[0].replace("_", " ").title()
+            return f"Generate ONLY a {version_name} version."
+        else:
+            version_names = [v.replace("_", " ").title() for v in desired_versions]
+            versions_str = " + ".join(version_names)
+            return f"Generate all three versions: {versions_str}.\nLabel each section clearly with its type."
+
     def build(
         self,
         template_type: TemplateType,
@@ -204,6 +222,7 @@ class PromptTemplates:
         topic: str,
         primary_context: str = "",
         secondary_context: str = "",
+        desired_versions: list = None,
     ) -> PromptResult:
         """
         Build a complete prompt ready for the LLM.
@@ -214,17 +233,33 @@ class PromptTemplates:
             topic:              What to write about
             primary_context:    Primary KB text (from DocumentProcessor)
             secondary_context:  Secondary KB text (from DocumentProcessor)
+            desired_versions:   List of versions to generate (["blog_post", "social_media", "newsletter"])
+                               If None, generates all three
 
         Returns:
             PromptResult with system_prompt and user_prompt ready to send.
         """
+        if desired_versions is None:
+            desired_versions = ["blog_post", "social_media", "newsletter"]
+
         ct_label = content_type.value.replace("_", " ")
+
+        # Build version instructions for the prompt
+        version_instructions = self._build_version_instructions(desired_versions)
+
+        # Build version label for prompt
+        if len(desired_versions) == 1:
+            versions_label = f"a {desired_versions[0].replace('_', ' ')}"
+        else:
+            version_names = [v.replace("_", " ") for v in desired_versions]
+            versions_label = " + ".join(version_names)
 
         if template_type == TemplateType.BRAND:
             system = TEMPLATE_1_SYSTEM
             user = TEMPLATE_1_USER.format(
                 primary_context=primary_context or "[No primary context loaded]",
-                content_type=ct_label,
+                versions=versions_label,
+                version_instructions=version_instructions,
                 topic=topic,
             )
 
@@ -232,7 +267,8 @@ class PromptTemplates:
             system = TEMPLATE_2_SYSTEM
             user = TEMPLATE_2_USER.format(
                 secondary_context=secondary_context or "[No secondary context loaded]",
-                content_type=ct_label,
+                versions=versions_label,
+                version_instructions=version_instructions,
                 topic=topic,
             )
 
@@ -241,7 +277,8 @@ class PromptTemplates:
             user = TEMPLATE_3_USER.format(
                 primary_context=primary_context or "[No primary context loaded]",
                 secondary_context=secondary_context or "[No secondary context loaded]",
-                content_type=ct_label,
+                versions=versions_label,
+                version_instructions=version_instructions,
                 topic=topic,
             )
 

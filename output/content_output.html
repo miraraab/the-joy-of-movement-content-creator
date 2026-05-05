@@ -65,6 +65,42 @@
             color: #1a1a1a;
         }
 
+        .tabs { margin-top: 20px; }
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 0;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tab-btn:hover {
+            color: #555;
+        }
+        .tab-btn.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+        }
+        .tab-content {
+            animation: fadeIn 0.2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .kb-tags { display: flex; gap: 8px; flex-wrap: wrap; }
         .kb-tag {
             border-radius: 6px;
@@ -119,13 +155,19 @@
     <div class="meta-row">
         <div class="pill"><strong>Format</strong> social_media</div>
         <div class="pill"><strong>Template</strong> hybrid</div>
-        <div class="pill"><strong>Length</strong> 1275 chars</div>
+        <div class="pill"><strong>Length</strong> 4407 chars</div>
         
     </div>
 
+    
     <div class="section">
         <h2>Generated Content</h2>
-        <div class="content-text"># Social Media Post (Instagram/Facebook)<br><br>---<br><br>Klaus didn't come for the fitness.<br><br>He came because his Monday was empty. Because his office identity had evaporated three months into retirement. Because the guys he'd worked with for 30 years suddenly had no reason to text him anymore.<br><br>Six weeks in, someone noticed he wasn't there one Tuesday.<br><br>Not the instructor. The group.<br><br>"Where were you?" they asked the next week. And something shifted in him.<br><br>That question — asked by people who had nothing to gain from him showing up — mattered more than any workout ever could.<br><br>Here's what nobody tells you: after 60, your body doesn't need optimizing. It needs *companionship*.<br><br>A fitness studio counts reps. We count Tuesdays you wouldn't cancel for anything.<br><br>A program ends. A community carries you.<br><br>**You are a Mover.** Not someone who attends. Someone who *belongs*.<br><br>Your first session is free. Your spot is already waiting.<br><br>---<br><br>**Word count: 128**<br><br>**Brand elements embedded:**<br>- Opening ritual (Tuesday rhythm, consistent group)<br>- Identity language ("You are a Mover")<br>- Market insight (post-retirement identity crisis)<br>- Differentiation through belonging, not fitness<br>- Warm, direct voice with specific human moment<br>- Closes on who Klaus *becomes*, not what he gets</div>
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn" onclick="showTab('generated_content')">Generated Content</button>
+            </div>
+            <div id="tab-generated_content" class="tab-content"><div class="content-text"># Blog Post: Why Community Matters More Than Fitness After 60<br><br>---<br><br>Klaus walked into his first Tuesday group at 62 with shoulders tight from three months of silence. His company had let him go. His wife had stopped asking when he'd "get back to normal." So he came to movement class the way you'd visit a doctor—because something needed fixing.<br><br>By week four, he wasn't thinking about his posture anymore.<br><br>He was thinking about whether Maria would be there (she was recovering from her daughter's wedding, but texted the group). He was thinking about the joke Thomas made during the warm-up. He was thinking about what he might say when it was his turn to share next week.<br><br>This is the moment most fitness programs miss entirely.<br><br>They see a 62-year-old body and imagine the goal: stronger shoulders, better cardio, injury prevention. All real. All useful. All completely insufficient.<br><br>What they don't see is what actually changes a life in this chapter: the moment you realize someone noticed you weren't there.<br><br>The German market is finally admitting what research has whispered for years—social isolation is deadlier than smoking after 65. But the fitness industry keeps responding to loneliness with better equipment, better instructors, better body metrics. As if belonging could be optimized.<br><br>It can't.<br><br>Belonging is built one Tuesday at a time. It's built when the same 12 people gather in the same place and the opening ritual—one sentence, one moment, one gesture—becomes something you count on. It's built when your story is heard, not filed. When your absence is noticed. When someone texts you.<br><br>This is why traditional fitness models are losing 55+ members after six months. Why commercial gyms desperately chase younger demographics. Why sports clubs are aging out but can't pivot. They're selling movement when people are actually buying identity.<br><br>Klaus isn't stronger because he "trains harder." He's different because he belongs.<br><br>After six months, he doesn't say: "I go to movement class."<br><br>He says: "I'm a Mover. My group meets Tuesday."<br><br>That sentence—that shift from attendance to identity—is the only metric that matters.<br><br>Because once you are something, you don't quit it. You don't cancel. You show up even when it's cold. You tell your friends. You become the person who invites the next person in.<br><br>Your body wasn't waiting for permission to move. It was waiting for a reason to stay.<br><br>That reason isn't fitness. It's belonging to a group of people who are writing their most interesting chapter together.<br><br>That's not what a gym promises. It's what a home delivers.<br><br>---<br><br># Social Media Version (Instagram/Facebook)<br><br>Klaus showed up to his first Tuesday group at 62 with no expectations.<br><br>By week four, he wasn't thinking about his workout. He was thinking about whether Maria would be there. Whether Thomas would make his joke again. Whether anyone noticed he'd almost skipped.<br><br>Someone did.<br><br>That's the moment fitness programs miss entirely. They see your body. They see your age. They see prevention and metrics.<br><br>We see community. We see belonging. We see you becoming the person who doesn't leave because leaving means losing your people.<br><br>After six months, Klaus doesn't say "I go to a movement class." He says "I'm a Mover. My group meets Tuesday."<br><br>That shift—from attendance to identity—is everything.<br><br>You don't quit what you are. You show up even when it's cold.<br><br>→ Your first Tuesday is free. Your spot is already waiting.<br><br>---<br><br># Newsletter Version (250–350 words)<br><br>**The Thing Fitness Gets Wrong About 60**<br><br>Klaus walked in at 62 with the posture of someone who'd been quietly disappearing.<br><br>Three months out of work. Wife tired of asking. Decided to try "one class"—the way you'd visit a doctor because something needed fixing.<br><br>By week four, it wasn't about his shoulders anymore.<br><br>It was about whether Maria would be there. About Thomas's warm-up joke. About what he might say when it was his turn to share. About the moment someone texted him a photo from Tuesday because he'd missed it.<br><br>That's the moment.<br><br>That's where fitness programs lose the plot entirely—and where the German market is finally catching up to what research has known for years. Social isolation after 65 is a public health crisis. Health insurance companies know it. Cities know it. The fitness industry keeps pretending it doesn't.<br><br>Because if they admitted it, they'd have to rebuild</div></div>
+        </div>
     </div>
 
     <div class="section">
@@ -142,7 +184,7 @@
             <div class="comparison-grid">
                 <div class="comparison-box our-output">
                     <div class="box-label">Joy of Movement AI System</div>
-                    <p># Social Media Post (Instagram/Facebook)<br><br>---<br><br>Klaus didn't come for the fitness.<br><br>He came because his Monday was empty. Because his office identity had evaporated three months into retirement. Because the guys he'd worked with for 30 years suddenly had no reason to text him anymore.<br><br>Six weeks in, someone noticed he wasn't there one Tuesday.<br><br>Not the instructor. The group.<br><br>"Where were you?" they asked the next week. And something shifted in him.<br><br>That question — asked by people who had nothing to gain from him showing up — mattered more than any workout ever could.<br><br>Here's what nobody tells you: after 60, your body doesn't need optimizing. It needs *companionship*.<br><br>A fitness studio counts reps. We count Tuesdays you wouldn't cancel for anything.<br><br>A program ends. A community carries you.<br><br>**You are a Mover.** Not someone who attends. Someone who *belongs*.<br><br>Your first session is free. Your spot is already waiting.<br><br>---<br><br>**Word count: 128**<br><br>**Brand elements embedded:**<br>- Opening ritual (Tuesday rhythm, consistent group)<br>- Identity language ("You are a Mover")<br>- Market insight (post-retirement identity crisis)<br>- Differentiation through belonging, not fitness<br>- Warm, direct voice with specific human moment<br>- Closes on who Klaus *becomes*, not what he gets</p>
+                    <p># Blog Post: Why Community Matters More Than Fitness After 60<br><br>---<br><br>Klaus walked into his first Tuesday group at 62 with shoulders tight from three months of silence. His company had let him go. His wife had stopped asking when he'd "get back to normal." So he came to movement class the way you'd visit a doctor—because something needed fixing.<br><br>By week four, he wasn't thinking about his posture anymore.<br><br>He was thinking about whether Maria would be there (she was recovering from her daughter's wedding, but texted the group). He was thinking about the joke Thomas made during the warm-up. He was thinking about what he might say when it was his turn to share next week.<br><br>This is the moment most fitness programs miss entirely.<br><br>They see a 62-year-old body and imagine the goal: stronger shoulders, better cardio, injury prevention. All real. All useful. All completely insufficient.<br><br>What they don't see is what actually changes a life in this chapter: the moment you realize someone noticed you weren't there.<br><br>The German market is finally admitting what research has whispered for years—social isolation is deadlier than smoking after 65. But the fitness industry keeps responding to loneliness with better equipment, better instructors, better body metrics. As if belonging could be optimized.<br><br>It can't.<br><br>Belonging is built one Tuesday at a time. It's built when the same 12 people gather in the same place and the opening ritual—one sentence, one moment, one gesture—becomes something you count on. It's built when your story is heard, not filed. When your absence is noticed. When someone texts you.<br><br>This is why traditional fitness models are losing 55+ members after six months. Why commercial gyms desperately chase younger demographics. Why sports clubs are aging out but can't pivot. They're selling movement when people are actually buying identity.<br><br>Klaus isn't stronger because he "trains harder." He's different because he belongs.<br><br>After six months, he doesn't say: "I go to movement class."<br><br>He says: "I'm a Mover. My group meets Tuesday."<br><br>That sentence—that shift from attendance to identity—is the only metric that matters.<br><br>Because once you are something, you don't quit it. You don't cancel. You show up even when it's cold. You tell your friends. You become the person who invites the next person in.<br><br>Your body wasn't waiting for permission to move. It was waiting for a reason to stay.<br><br>That reason isn't fitness. It's belonging to a group of people who are writing their most interesting chapter together.<br><br>That's not what a gym promises. It's what a home delivers.<br><br>---<br><br># Social Media Version (Instagram/Facebook)<br><br>Klaus showed up to his first Tuesday group at 62 with no expectations.<br><br>By week four, he wasn't thinking about his workout. He was thinking about whether Maria would be there. Whether Thomas would make his joke again. Whether anyone noticed he'd almost skipped.<br><br>Someone did.<br><br>That's the moment fitness programs miss entirely. They see your body. They see your age. They see prevention and metrics.<br><br>We see community. We see belonging. We see you becoming the person who doesn't leave because leaving means losing your people.<br><br>After six months, Klaus doesn't say "I go to a movement class." He says "I'm a Mover. My group meets Tuesday."<br><br>That shift—from attendance to identity—is everything.<br><br>You don't quit what you are. You show up even when it's cold.<br><br>→ Your first Tuesday is free. Your spot is already waiting.<br><br>---<br><br># Newsletter Version (250–350 words)<br><br>**The Thing Fitness Gets Wrong About 60**<br><br>Klaus walked in at 62 with the posture of someone who'd been quietly disappearing.<br><br>Three months out of work. Wife tired of asking. Decided to try "one class"—the way you'd visit a doctor because something needed fixing.<br><br>By week four, it wasn't about his shoulders anymore.<br><br>It was about whether Maria would be there. About Thomas's warm-up joke. About what he might say when it was his turn to share. About the moment someone texted him a photo from Tuesday because he'd missed it.<br><br>That's the moment.<br><br>That's where fitness programs lose the plot entirely—and where the German market is finally catching up to what research has known for years. Social isolation after 65 is a public health crisis. Health insurance companies know it. Cities know it. The fitness industry keeps pretending it doesn't.<br><br>Because if they admitted it, they'd have to rebuild</p>
                 </div>
                 <div class="comparison-box generic-output">
                     <div class="box-label">Generic ChatGPT</div>
@@ -156,5 +198,31 @@
     </div>
 
 </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.style.display = 'none');
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            const selectedTab = document.getElementById('tab-' + tabName);
+            if (selectedTab) selectedTab.style.display = 'block';
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Show first tab by default on load
+        window.addEventListener('load', function() {
+            const firstBtn = document.querySelector('.tab-btn');
+            if (firstBtn) firstBtn.classList.add('active');
+        });
+    </script>
+
 </body>
 </html>

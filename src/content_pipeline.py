@@ -30,6 +30,7 @@ class ContentBrief:
     target_audience: str = "55+ German adults in life transition"
     key_message: str = ""
     notes: str = ""
+    desired_versions: list = field(default_factory=lambda: ["blog_post", "social_media", "newsletter"])
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
@@ -133,6 +134,53 @@ class ContentPipeline:
         return report
 
     # ------------------------------------------------------------------
+    # Helper: Interactive version selection
+    # ------------------------------------------------------------------
+
+    def select_versions(self) -> list:
+        """
+        Interactive menu to select which content versions to generate.
+        Saves tokens by only generating what's needed.
+        """
+        print("\n" + "=" * 60)
+        print("SELECT CONTENT VERSIONS TO GENERATE")
+        print("=" * 60)
+        print("Which versions do you want? Choose one option:\n")
+        print("1) Blog Post only")
+        print("2) Social Media Post only")
+        print("3) Newsletter only")
+        print("4) Blog Post + Social Media")
+        print("5) Blog Post + Newsletter")
+        print("6) Social Media + Newsletter")
+        print("7) All Three (Blog Post + Social Media + Newsletter)")
+        print("0) Cancel")
+
+        choice = input("\nEnter number (0-7): ").strip()
+
+        version_map = {
+            "1": ["blog_post"],
+            "2": ["social_media"],
+            "3": ["newsletter"],
+            "4": ["blog_post", "social_media"],
+            "5": ["blog_post", "newsletter"],
+            "6": ["social_media", "newsletter"],
+            "7": ["blog_post", "social_media", "newsletter"],
+            "0": None,
+        }
+
+        selected = version_map.get(choice)
+        if selected is None:
+            print("[CANCELLED] Generation aborted.")
+            return None
+
+        if selected:
+            print(f"[OK] Selected: {', '.join([v.replace('_', ' ').title() for v in selected])}")
+            return selected
+
+        print("[ERROR] Invalid choice. Please try again.")
+        return self.select_versions()
+
+    # ------------------------------------------------------------------
     # Stage 3: Brief
     # ------------------------------------------------------------------
 
@@ -143,6 +191,7 @@ class ContentPipeline:
         template_type: TemplateType,
         key_message: str = "",
         notes: str = "",
+        desired_versions: list = None,
     ) -> ContentBrief:
         """Define the content brief before generation."""
         print("\n" + "=" * 60)
@@ -155,12 +204,14 @@ class ContentPipeline:
             template_type=template_type,
             key_message=key_message,
             notes=notes,
+            desired_versions=desired_versions or ["blog_post", "social_media", "newsletter"],
         )
 
         print(f"Topic:        {brief.topic}")
         print(f"Format:       {brief.content_type.value}")
         print(f"Template:     {brief.template_type.value}")
         print(f"Key message:  {brief.key_message or '(none specified)'}")
+        print(f"Versions:     {', '.join([v.replace('_', ' ').title() for v in brief.desired_versions])}")
         print(f"Notes:        {brief.notes or '(none)'}")
         print("[OK] Brief created.")
 
@@ -192,6 +243,7 @@ class ContentPipeline:
             topic=topic,
             primary_context=self.primary_context,
             secondary_context=self.secondary_context,
+            desired_versions=brief.desired_versions,
         )
 
         generated_text = self.llm.generate(prompt)
@@ -257,6 +309,62 @@ class ContentPipeline:
         return output
 
     # ------------------------------------------------------------------
+    # Helper: Parse content versions
+    # ------------------------------------------------------------------
+
+    def _parse_content_versions(self, text: str) -> dict:
+        """
+        Parse generated content to extract individual versions.
+        Expected format:
+        # BLOG POST VERSION (XXX words)
+        [content]
+        # SOCIAL MEDIA VERSION (Instagram/Facebook)
+        [content]
+        # NEWSLETTER VERSION
+        [content]
+        """
+        versions = {}
+        lines = text.split('\n')
+
+        current_version = None
+        current_content = []
+
+        for line in lines:
+            # Check for version headers
+            if '# BLOG POST VERSION' in line:
+                # Save previous version
+                if current_version and current_content:
+                    versions[current_version] = '\n'.join(current_content).strip()
+                current_version = 'blog_post'
+                current_content = []
+            elif '# SOCIAL MEDIA VERSION' in line:
+                # Save previous version
+                if current_version and current_content:
+                    versions[current_version] = '\n'.join(current_content).strip()
+                current_version = 'social_media'
+                current_content = []
+            elif '# NEWSLETTER VERSION' in line:
+                # Save previous version
+                if current_version and current_content:
+                    versions[current_version] = '\n'.join(current_content).strip()
+                current_version = 'newsletter'
+                current_content = []
+            else:
+                # Collect content for current version
+                if current_version:
+                    current_content.append(line)
+
+        # Don't forget the last version
+        if current_version and current_content:
+            versions[current_version] = '\n'.join(current_content).strip()
+
+        # If no versions found, return the whole text as a single version
+        if not versions:
+            versions['generated_content'] = text.strip()
+
+        return versions
+
+    # ------------------------------------------------------------------
     # HTML Export (CEO-ready presentation output)
     # ------------------------------------------------------------------
 
@@ -265,19 +373,63 @@ class ContentPipeline:
         output: ContentOutput,
         filepath: str = "output/content_output.html",
         generic_comparison: str = "",
+        display_content_type: Optional[str] = None,
     ) -> str:
         """
         Export generated content as a styled HTML file.
         Opens cleanly in any browser – no frameworks, no dependencies.
 
         Args:
-            output:              ContentOutput from stage_publish() or stage_iterate()
-            filepath:            Where to save the HTML file
-            generic_comparison:  Optional: paste generic ChatGPT output for side-by-side
+            output:                  ContentOutput from stage_publish() or stage_iterate()
+            filepath:                Where to save the HTML file
+            generic_comparison:      Optional: paste generic ChatGPT output for side-by-side
+            display_content_type:    Optional: which version to display ("social_media", "blog_post", "newsletter")
+                                     If None, shows interactive tabs with all available versions
         Returns:
             filepath (str)
         """
         Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+
+        # Parse content versions from generated text
+        content_versions = self._parse_content_versions(output.generated_text)
+
+        # If display_content_type is specified, show only that version
+        # Otherwise, show all available versions with tabs
+        if display_content_type and display_content_type in content_versions:
+            display_text = content_versions[display_content_type]
+            content_block = f"""
+    <div class="section">
+        <h2>{display_content_type.replace('_', ' ').title()}</h2>
+        <div class="content-text">{display_text.replace(chr(10), '<br>')}</div>
+    </div>"""
+        else:
+            # Show all versions with interactive tabs
+            tab_buttons = "".join(
+                f'<button class="tab-btn" onclick="showTab(\'{version}\')">{version.replace("_", " ").title()}</button>'
+                for version in content_versions.keys()
+            )
+            tab_contents = "".join(
+                f'<div id="tab-{version}" class="tab-content" style="display:none;"><div class="content-text">{text.replace(chr(10), "<br>")}</div></div>'
+                for version, text in content_versions.items()
+            )
+            # Show first tab by default
+            first_version = next(iter(content_versions.keys()))
+            tab_contents = f'<div id="tab-{first_version}" class="tab-content"><div class="content-text">{content_versions[first_version].replace(chr(10), "<br>")}</div></div>' + \
+                          "".join(
+                f'<div id="tab-{version}" class="tab-content" style="display:none;"><div class="content-text">{text.replace(chr(10), "<br>")}</div></div>'
+                for version, text in list(content_versions.items())[1:]
+            )
+
+            content_block = f"""
+    <div class="section">
+        <h2>Generated Content</h2>
+        <div class="tabs">
+            <div class="tab-buttons">
+                {tab_buttons}
+            </div>
+            {tab_contents}
+        </div>
+    </div>"""
 
         # Build comparison block only if generic text is provided
         comparison_block = ""
@@ -311,6 +463,33 @@ class ContentPipeline:
             "<div class='pill'><strong>Feedback applied</strong> ✓</div>"
             if output.feedback else ""
         )
+
+        tab_script = """
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.style.display = 'none');
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            const selectedTab = document.getElementById('tab-' + tabName);
+            if (selectedTab) selectedTab.style.display = 'block';
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Show first tab by default on load
+        window.addEventListener('load', function() {
+            const firstBtn = document.querySelector('.tab-btn');
+            if (firstBtn) firstBtn.classList.add('active');
+        });
+    </script>
+"""
 
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -379,6 +558,42 @@ class ContentPipeline:
             color: #1a1a1a;
         }}
 
+        .tabs {{ margin-top: 20px; }}
+        .tab-buttons {{
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 0;
+        }}
+        .tab-btn {{
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        .tab-btn:hover {{
+            color: #555;
+        }}
+        .tab-btn.active {{
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+        }}
+        .tab-content {{
+            animation: fadeIn 0.2s;
+        }}
+        @keyframes fadeIn {{
+            from {{ opacity: 0; }}
+            to {{ opacity: 1; }}
+        }}
+
         .kb-tags {{ display: flex; gap: 8px; flex-wrap: wrap; }}
         .kb-tag {{
             border-radius: 6px;
@@ -437,10 +652,7 @@ class ContentPipeline:
         {feedback_pill}
     </div>
 
-    <div class="section">
-        <h2>Generated Content</h2>
-        <div class="content-text">{output.generated_text.replace(chr(10), '<br>')}</div>
-    </div>
+    {content_block}
 
     <div class="section">
         <h2>Knowledge Base Sources</h2>
@@ -457,6 +669,7 @@ class ContentPipeline:
     </div>
 
 </div>
+{tab_script}
 </body>
 </html>"""
 
@@ -474,19 +687,31 @@ class ContentPipeline:
         content_type: ContentType = ContentType.SOCIAL_MEDIA,
         template_type: TemplateType = TemplateType.HYBRID,
         key_message: str = "",
+        desired_versions: list = None,
     ) -> ContentOutput:
         """
         Run the full pipeline in one call.
         Stages: Document → Monitor → Brief → Publish
         (Iterate is manual – call stage_iterate() after reviewing output)
+
+        Args:
+            desired_versions: List of versions to generate. If None, ask user interactively.
         """
         self.stage_document()
         self.stage_monitor()
+
+        # Ask user which versions to generate if not specified
+        if desired_versions is None:
+            desired_versions = self.select_versions()
+            if desired_versions is None:
+                return None
+
         brief = self.stage_brief(
             topic=topic,
             content_type=content_type,
             template_type=template_type,
             key_message=key_message,
+            desired_versions=desired_versions,
         )
         return self.stage_publish(brief)
 
