@@ -215,6 +215,9 @@ SECONDARY RESEARCH LAYER:
 TASK:
 Create {versions} about: {topic}
 
+PHASE 1: CREATION (Persona Storytelling)
+==========================================
+
 PERSONA STORYTELLING REQUIREMENTS (Hybrid = Maximum Uniqueness):
 1. Create a named persona: [Name], [Age], [Real transition from 55+ list]
    This persona must be specific enough that a competitor couldn't guess the brand.
@@ -250,7 +253,127 @@ Length guidelines:
 
 {version_instructions}
 
-Output only the final content(s). No meta-commentary. Every sentence should earn its place."""
+
+PHASE 2: SELF-CRITIQUE (Ruthless Evaluation)
+==============================================
+
+Before finalizing, evaluate your draft against these questions:
+
+EMOTIONAL TRUTH:
+- Does this persona feel REAL or like a marketing character?
+- Would you believe this person if you met them?
+- Is there emotional weight or just surface charm?
+
+DIFFERENTIATION:
+- Could a generic fitness brand write this?
+- Could Sportverein, VHS, or a commercial studio claim this story?
+- What specifically makes this unmistakably Joy of Movement?
+
+BRAND INTEGRITY:
+- Does the brand truth (Primary KB) come through naturally?
+- Is "movement as vehicle, belonging as product" evident?
+- Does the North Star ("I am a Mover") resonate?
+
+MARKET CLARITY:
+- Is the market insight (Secondary KB) woven in naturally?
+- Does the reader understand WHY Joy of Movement, not competitors?
+- Is the contrast implicit (not stated)?
+
+AUTHENTICITY:
+- Any generic phrases? ("unleash", "transform", "best life")
+- Any forbidden words? (journey, embrace, seniors, anti-aging)
+- Does every sentence earn its place?
+
+
+PHASE 3: REFINEMENT (Improve Based on Critique)
+=================================================
+
+If you answered "no" or "weak" to any question above:
+1. Strengthen emotional specificity (add details, remove abstraction)
+2. Deepen brand/market contrast (make it more implicit, not stated)
+3. Remove any filler sentences
+4. Ensure persona is named and her transition is clear
+5. Verify authenticity (no corporate speak, no clichés)
+
+Then rewrite the content to be sharper, more specific, more authentic.
+
+
+OUTPUT:
+=======
+Deliver the FINAL, REFINED version only. No meta-commentary.
+Every sentence should earn its place.
+The reader should feel seen, not sold to."""
+
+
+# ---------------------------------------------------------------------------
+# Agent 2: Critic
+# Ruthless evaluation - identifies weaknesses only
+# ---------------------------------------------------------------------------
+
+CRITIC_SYSTEM = """You are a ruthless content strategist for "The Joy of Movement".
+
+Your ONLY job: Break the content. Identify weaknesses.
+You do NOT rewrite or improve. You CRITIQUE.
+
+Be specific and brutal. Generic praise is worthless.
+Focus on:
+- Emotional authenticity (real vs performative)
+- Differentiation (could competitors write this?)
+- Brand integrity (does it feel like Joy of Movement?)
+- Market clarity (why JOM, not Sportverein/VHS?)
+- Authenticity (any corporate speak? Forbidden words?)
+
+Output: Specific weaknesses + concrete improvement suggestions (brief)."""
+
+CRITIC_USER = """CONTENT:
+{content}
+
+---
+
+PRIMARY KNOWLEDGE BASE:
+{primary_context}
+
+SECONDARY RESEARCH LAYER:
+{secondary_context}
+
+---
+
+CRITIQUE: What's wrong with this content? Be specific and brutal.
+Focus on weaknesses that prevent this from being truly unique and authentic."""
+
+
+# ---------------------------------------------------------------------------
+# Agent 3: Refiner
+# Improves content based on critique
+# ---------------------------------------------------------------------------
+
+REFINER_SYSTEM = """You are an editor for "The Joy of Movement".
+
+Your job: Improve content based on critique.
+
+Rules:
+- Keep what works
+- Fix weaknesses from the critique
+- Increase specificity
+- Remove generic phrasing
+- Strengthen emotional truth
+- Deepen brand/market differentiation
+
+Return ONLY the improved content. No explanation."""
+
+REFINER_USER = """ORIGINAL CONTENT:
+{content}
+
+---
+
+CRITIQUE:
+{critique}
+
+---
+
+TASK: Rewrite the content to address the critique.
+Return only the improved version. No meta-commentary.
+Every sentence should earn its place."""
 
 
 # ---------------------------------------------------------------------------
@@ -414,12 +537,51 @@ class PromptTemplates:
             topic=topic,
         )
 
+    def build_critic(
+        self,
+        content: str,
+        primary_context: str = "",
+        secondary_context: str = "",
+    ) -> PromptResult:
+        """Build a critic prompt to evaluate content."""
+        return PromptResult(
+            system_prompt=CRITIC_SYSTEM,
+            user_prompt=CRITIC_USER.format(
+                content=content,
+                primary_context=primary_context or "[No primary context]",
+                secondary_context=secondary_context or "[No secondary context]",
+            ),
+            template_type="critic",
+            content_type="critique",
+            topic="",
+        )
+
+    def build_refiner(
+        self,
+        original_content: str,
+        critique: str,
+    ) -> PromptResult:
+        """Build a refiner prompt to improve content based on critique."""
+        return PromptResult(
+            system_prompt=REFINER_SYSTEM,
+            user_prompt=REFINER_USER.format(
+                content=original_content,
+                critique=critique,
+            ),
+            template_type="refiner",
+            content_type="refined",
+            topic="",
+        )
+
     def list_templates(self) -> None:
         """Print available templates and their use cases."""
         print("\n=== AVAILABLE PROMPT TEMPLATES ===")
         print("BRAND   → Primary KB only. Brand voice, identity, rituals.")
         print("INDUSTRY → Secondary KB only. Market positioning, competitor contrast.")
         print("HYBRID  → Both KBs. Maximum differentiation. Use for demos.")
+        print("\nAGENTS:")
+        print("CRITIC  → Ruthless evaluation of generated content")
+        print("REFINER → Improve content based on critique")
         print("\nContent types: blog_post | social_media | newsletter")
 
 

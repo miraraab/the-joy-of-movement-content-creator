@@ -346,6 +346,106 @@ Return ONLY valid JSON (no markdown, no explanation):
         return output
 
     # ------------------------------------------------------------------
+    # Stage 4.75: Critique (Multi-Agent Quality Control)
+    # ------------------------------------------------------------------
+
+    def stage_critique(self, output: ContentOutput) -> str:
+        """
+        Ruthlessly evaluate generated content.
+        Returns critique feedback as string.
+        """
+        print("\n" + "=" * 60)
+        print("STAGE 4.75: CRITIQUE (Multi-Agent Quality Control)")
+        print("=" * 60)
+
+        prompt = self.templates.build_critic(
+            content=output.generated_text,
+            primary_context=self.primary_context,
+            secondary_context=self.secondary_context,
+        )
+
+        critique = self.llm.generate(prompt)
+
+        print("\n" + "-" * 60)
+        print("CRITIQUE FEEDBACK:")
+        print("-" * 60)
+        print(critique)
+        print("-" * 60)
+        print("[OK] Content evaluated.")
+
+        return critique
+
+    # ------------------------------------------------------------------
+    # Stage 4.9: Refine (Multi-Agent Improvement)
+    # ------------------------------------------------------------------
+
+    def stage_refine_content(self, output: ContentOutput, critique: str) -> ContentOutput:
+        """
+        Improve content based on critique.
+        Returns refined ContentOutput.
+        """
+        print("\n" + "=" * 60)
+        print("STAGE 4.9: REFINE (Multi-Agent Improvement)")
+        print("=" * 60)
+
+        prompt = self.templates.build_refiner(
+            original_content=output.generated_text,
+            critique=critique,
+        )
+
+        refined_text = self.llm.generate(prompt)
+
+        # Create new output with refined content
+        refined_output = ContentOutput(
+            brief=output.brief,
+            generated_text=refined_text,
+            template_type=output.template_type,
+            content_type=output.content_type,
+            topic=output.topic,
+            iteration=output.iteration,  # Keep original iteration count
+        )
+
+        print("\n" + "-" * 60)
+        print("REFINED CONTENT:")
+        print("-" * 60)
+        print(refined_text)
+        print("-" * 60)
+        print(f"[OK] Content refined. {refined_output.char_count} chars.")
+
+        return refined_output
+
+    # ------------------------------------------------------------------
+    # Stage 4.95: Auto-Improve Pipeline
+    # ------------------------------------------------------------------
+
+    def stage_publish_with_quality_control(self, brief: ContentBrief) -> ContentOutput:
+        """
+        Full pipeline: Create → Critique → Refine
+        Returns high-quality content in a single workflow.
+        """
+        print("\n" + "=" * 60)
+        print("FULL PIPELINE: CREATE → CRITIQUE → REFINE")
+        print("=" * 60)
+
+        # Stage 1: Create
+        output = self.stage_publish(brief)
+
+        # Stage 2: Critique
+        critique = self.stage_critique(output)
+
+        # Stage 3: Refine
+        refined_output = self.stage_refine_content(output, critique)
+
+        # Use refined output
+        self.history[-1] = refined_output  # Replace with refined version
+
+        print("\n" + "=" * 60)
+        print("QUALITY CONTROL COMPLETE")
+        print("=" * 60)
+
+        return refined_output
+
+    # ------------------------------------------------------------------
     # Stage 5: Iterate
     # ------------------------------------------------------------------
 

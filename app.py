@@ -108,7 +108,7 @@ def create_brief():
 
 @app.route('/api/publish', methods=['POST'])
 def publish():
-    """STAGE 4: Publish (generate content)"""
+    """STAGE 4: Publish (generate content with multi-agent quality control)"""
     session_id = get_or_create_session_id()
     session_data = get_pipeline(session_id)
     pipeline = session_data['pipeline']
@@ -117,7 +117,8 @@ def publish():
     if brief is None:
         return jsonify({'error': 'No brief created'}), 400
 
-    output = pipeline.stage_publish(brief)
+    # Use full pipeline: Create → Critique → Refine
+    output = pipeline.stage_publish_with_quality_control(brief)
     session_data['current_output'] = output
 
     return jsonify({
