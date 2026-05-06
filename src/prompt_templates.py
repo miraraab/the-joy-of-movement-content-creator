@@ -215,9 +215,6 @@ SECONDARY RESEARCH LAYER:
 TASK:
 Create {versions} about: {topic}
 
-PHASE 1: CREATION (Persona Storytelling)
-==========================================
-
 PERSONA STORYTELLING REQUIREMENTS (Hybrid = Maximum Uniqueness):
 1. Create a named persona: [Name], [Age], [Real transition from 55+ list]
    This persona must be specific enough that a competitor couldn't guess the brand.
@@ -253,56 +250,8 @@ Length guidelines:
 
 {version_instructions}
 
-
-PHASE 2: SELF-CRITIQUE (Ruthless Evaluation)
-==============================================
-
-Before finalizing, evaluate your draft against these questions:
-
-EMOTIONAL TRUTH:
-- Does this persona feel REAL or like a marketing character?
-- Would you believe this person if you met them?
-- Is there emotional weight or just surface charm?
-
-DIFFERENTIATION:
-- Could a generic fitness brand write this?
-- Could Sportverein, VHS, or a commercial studio claim this story?
-- What specifically makes this unmistakably Joy of Movement?
-
-BRAND INTEGRITY:
-- Does the brand truth (Primary KB) come through naturally?
-- Is "movement as vehicle, belonging as product" evident?
-- Does the North Star ("I am a Mover") resonate?
-
-MARKET CLARITY:
-- Is the market insight (Secondary KB) woven in naturally?
-- Does the reader understand WHY Joy of Movement, not competitors?
-- Is the contrast implicit (not stated)?
-
-AUTHENTICITY:
-- Any generic phrases? ("unleash", "transform", "best life")
-- Any forbidden words? (journey, embrace, seniors, anti-aging)
-- Does every sentence earn its place?
-
-
-PHASE 3: REFINEMENT (Improve Based on Critique)
-=================================================
-
-If you answered "no" or "weak" to any question above:
-1. Strengthen emotional specificity (add details, remove abstraction)
-2. Deepen brand/market contrast (make it more implicit, not stated)
-3. Remove any filler sentences
-4. Ensure persona is named and her transition is clear
-5. Verify authenticity (no corporate speak, no clichés)
-
-Then rewrite the content to be sharper, more specific, more authentic.
-
-
-OUTPUT:
-=======
-Deliver the FINAL, REFINED version only. No meta-commentary.
-Every sentence should earn its place.
-The reader should feel seen, not sold to."""
+Output only the final content. No meta-commentary. Every sentence should earn its place.
+(Critique and refinement handled by separate Critic and Refiner agents in the multi-agent pipeline.)
 
 
 # ---------------------------------------------------------------------------
