@@ -361,16 +361,9 @@ SCORER_USER = """CONTENT:
 
 ---
 
-Evaluate and return JSON only (no other text):
-{{
-  "emotional_truth": 0,
-  "differentiation": 0,
-  "brand_integrity": 0,
-  "authenticity": 0,
-  "overall_score": 0.0,
-  "strengths": ["strength 1", "strength 2"],
-  "weaknesses": ["weakness 1", "weakness 2"]
-}}"""
+Evaluate and return JSON only (no other text). Use this exact format:
+
+{{"emotional_truth": 7, "differentiation": 6, "brand_integrity": 8, "authenticity": 7, "overall_score": 7.0, "strengths": ["strength 1"], "weaknesses": ["weakness 1"]}}"""
 
 
 # ---------------------------------------------------------------------------
