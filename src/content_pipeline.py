@@ -31,15 +31,14 @@ class ScoreIssue:
 
 @dataclass
 class ContentScore:
-    """Evaluates generated content against brand criteria."""
-    voice_authenticity: float
-    constraint_compliance: float
-    identity_clarity: float
-    story_quality: float
-    competitor_contrast: float
-    overall_score: float
-    feedback: str
-    issues: list = field(default_factory=list)
+    """Evaluates generated content against 4 brand dimensions."""
+    emotional_truth: float  # 1-10: Real emotion vs manufactured
+    differentiation: float  # 1-10: Unique to JOM vs generic
+    brand_integrity: float  # 1-10: Unmistakably Joy of Movement
+    authenticity: float     # 1-10: No corporate speak, forbidden words
+    overall_score: float    # Average of above 4
+    strengths: list = field(default_factory=list)
+    weaknesses: list = field(default_factory=list)
 
 
 @dataclass
@@ -294,56 +293,61 @@ class ContentPipeline:
     # Stage 4.5: Score
     # ------------------------------------------------------------------
 
-    def stage_score(self, output: ContentOutput) -> ContentOutput:
+    def stage_score(self, output: ContentOutput) -> ContentScore:
         """
-        Evaluate generated content against brand criteria.
-        Produces numeric scores and actionable feedback.
+        Evaluate content on 4 dimensions (1-10 each).
+        Returns ContentScore with JSON-parsed results.
         """
         print("\n" + "=" * 60)
-        print("STAGE 4.5: SCORE")
+        print("STAGE 4.5: SCORE (Quality Control)")
         print("=" * 60)
 
-        from prompt_templates import SCORING_SYSTEM
-
-        user_prompt = f"""Evaluate this content:
-
-{output.generated_text}
-
-Return ONLY valid JSON (no markdown, no explanation):
-{{"voice_authenticity": 8, "constraint_compliance": 9, "identity_clarity": 7, "story_quality": 8, "competitor_contrast": 6, "overall_score": 7.6, "feedback": "Strong voice...", "issues": [{{"problem": "Issue", "suggestion": "Fix"}}]}}"""
-
-        prompt = PromptResult(
-            system_prompt=SCORING_SYSTEM,
-            user_prompt=user_prompt,
-            template_type="scoring",
-            content_type=output.content_type,
-            topic=output.topic,
-        )
-
+        prompt = self.templates.build_scorer(content=output.generated_text)
         score_json_str = self.llm.generate(prompt)
 
         try:
             score_data = json.loads(score_json_str)
-            issues = [
-                ScoreIssue(problem=issue["problem"], suggestion=issue["suggestion"])
-                for issue in score_data.get("issues", [])
-            ]
-            output.score = ContentScore(
-                voice_authenticity=score_data["voice_authenticity"],
-                constraint_compliance=score_data["constraint_compliance"],
-                identity_clarity=score_data["identity_clarity"],
-                story_quality=score_data["story_quality"],
-                competitor_contrast=score_data["competitor_contrast"],
-                overall_score=score_data["overall_score"],
-                feedback=score_data["feedback"],
-                issues=issues,
-            )
-            print(f"[OK] Score: {output.score.overall_score:.1f}/10")
-        except (json.JSONDecodeError, KeyError) as e:
-            print(f"[WARN] Scoring failed: {e}")
-            output.score = None
 
-        return output
+            score = ContentScore(
+                emotional_truth=score_data["emotional_truth"],
+                differentiation=score_data["differentiation"],
+                brand_integrity=score_data["brand_integrity"],
+                authenticity=score_data["authenticity"],
+                overall_score=score_data["overall_score"],
+                strengths=score_data.get("strengths", []),
+                weaknesses=score_data.get("weaknesses", []),
+            )
+
+            output.score = score
+
+            print(f"\n[SCORE RESULTS]")
+            print(f"  Emotional Truth:    {score.emotional_truth:.1f}/10")
+            print(f"  Differentiation:    {score.differentiation:.1f}/10")
+            print(f"  Brand Integrity:    {score.brand_integrity:.1f}/10")
+            print(f"  Authenticity:       {score.authenticity:.1f}/10")
+            print(f"  ──────────────────────")
+            print(f"  Overall Score:      {score.overall_score:.1f}/10")
+
+            if score.overall_score >= 8.0:
+                print(f"  ✅ THRESHOLD MET (≥8.0) - Ready to stop")
+            else:
+                print(f"  ⚠️  Below threshold - Iterate further")
+
+            return score
+
+        except (json.JSONDecodeError, KeyError, ValueError) as e:
+            print(f"[ERROR] Scoring failed: {e}")
+            print(f"[DEBUG] Response was: {score_json_str[:200]}")
+            # Return default low score on error
+            return ContentScore(
+                emotional_truth=0,
+                differentiation=0,
+                brand_integrity=0,
+                authenticity=0,
+                overall_score=0,
+                strengths=[],
+                weaknesses=["Scoring error"],
+            )
 
     # ------------------------------------------------------------------
     # Stage 4.75: Critique (Multi-Agent Quality Control)
@@ -415,35 +419,75 @@ Return ONLY valid JSON (no markdown, no explanation):
         return refined_output
 
     # ------------------------------------------------------------------
-    # Stage 4.95: Auto-Improve Pipeline
+    # Stage 4.95: Iteration Control Pipeline (with Scoring & Threshold)
     # ------------------------------------------------------------------
 
-    def stage_publish_with_quality_control(self, brief: ContentBrief) -> ContentOutput:
+    def stage_publish_with_iteration_control(self, brief: ContentBrief, max_loops: int = 1, threshold: float = 8.0) -> ContentOutput:
         """
-        Full pipeline: Create → Critique → Refine
-        Returns high-quality content in a single workflow.
+        Full multi-agent pipeline with iteration:
+        Create → Critique → Refine → Score → (loop if score < threshold)
+
+        Args:
+            brief: Content brief
+            max_loops: Max refinement iterations (default 1 = test version once)
+            threshold: Quality threshold to stop (default 8.0/10)
+
+        Returns:
+            ContentOutput with highest scoring version
         """
         print("\n" + "=" * 60)
-        print("FULL PIPELINE: CREATE → CRITIQUE → REFINE")
+        print(f"MULTI-AGENT ITERATION CONTROL")
+        print(f"Max Loops: {max_loops}, Threshold: {threshold:.1f}/10")
         print("=" * 60)
 
-        # Stage 1: Create
+        # LOOP 0: Initial creation
+        print("\n[LOOP 0] CREATION")
         output = self.stage_publish(brief)
 
-        # Stage 2: Critique
-        critique = self.stage_critique(output)
+        best_output = output
+        best_score = None
 
-        # Stage 3: Refine
-        refined_output = self.stage_refine_content(output, critique)
+        for loop_num in range(max_loops):
+            print(f"\n[LOOP {loop_num + 1}] CRITIQUE → REFINE → SCORE")
+            print("-" * 60)
 
-        # Use refined output
-        self.history[-1] = refined_output  # Replace with refined version
+            # Stage 1: Critique
+            critique = self.stage_critique(output)
+
+            # Stage 2: Refine
+            refined_output = self.stage_refine_content(output, critique)
+
+            # Stage 3: Score
+            score = self.stage_score(refined_output)
+
+            # Track best version
+            if best_score is None or score.overall_score > best_score.overall_score:
+                best_output = refined_output
+                best_score = score
+
+            # Decision: Stop if threshold reached
+            if score.overall_score >= threshold:
+                print(f"\n✅ THRESHOLD MET ({score.overall_score:.1f} ≥ {threshold:.1f})")
+                print("Stopping iteration.")
+                break
+            else:
+                print(f"\n⚠️  Below threshold ({score.overall_score:.1f} < {threshold:.1f})")
+                if loop_num < max_loops - 1:
+                    print("Will iterate further...")
+                    output = refined_output
+                else:
+                    print("Max loops reached. Using best version.")
+
+        # Final: Use best output
+        best_output.score = best_score
+        self.history[-1] = best_output
 
         print("\n" + "=" * 60)
-        print("QUALITY CONTROL COMPLETE")
+        print("ITERATION COMPLETE")
+        print(f"Final Score: {best_score.overall_score:.1f}/10")
         print("=" * 60)
 
-        return refined_output
+        return best_output
 
     # ------------------------------------------------------------------
     # Stage 5: Iterate

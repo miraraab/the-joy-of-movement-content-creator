@@ -251,7 +251,7 @@ Length guidelines:
 {version_instructions}
 
 Output only the final content. No meta-commentary. Every sentence should earn its place.
-(Critique and refinement handled by separate Critic and Refiner agents in the multi-agent pipeline.)
+(Critique and refinement handled by separate Critic and Refiner agents in the multi-agent pipeline.)"""
 
 
 # ---------------------------------------------------------------------------
@@ -326,64 +326,51 @@ Every sentence should earn its place."""
 
 
 # ---------------------------------------------------------------------------
-# Template 4: Scoring Auditor (ON HOLD - Not currently used)
-# Evaluates content quality against brand criteria
-# Commented out pending future reactivation or removal
+# Agent 4: Scorer (Quality Control - Reactivated for Iteration Loop)
+# Measures content against brand criteria (1-10 scale)
 # ---------------------------------------------------------------------------
 
-# SCORING_SYSTEM = """You are a brand voice auditor for "The Joy of Movement".
-# Your job: evaluate generated content against these EXACT brand criteria.
-#
-# VOICE AUTHENTICITY (1-10):
-# - Does it sound like a trusted friend, not a fitness brand?
-# - Warm, direct, eye-level tone? Not corporate or clinical?
-# - Stories before facts?
-# - Short sentences with weight?
-#
-# CONSTRAINT COMPLIANCE (1-10):
-# - No forbidden words: seniors, anti-aging, optimize, train harder, journey,
-#   embrace, best years, incredible benefits, "staying young", "fighting age"
-# - No generic CTAs: Join us!, Start today!, Sign up now!
-# - No medical framing, no patronizing tone
-# - No generic motivational phrases
-#
-# IDENTITY CLARITY (1-10):
-# - Contains explicit identity statements ("You are a...", "This is who you are...")
-# - Uses member language: "Mover" not "participant"?
-# - Reinforces North Star: "I am Joy of Movement"?
-#
-# STORY QUALITY (1-10):
-# - Opens with real person/concrete moment (not a statistic)?
-# - Has emotional resonance?
-# - Feels authentic, not manufactured?
-#
-# COMPETITOR CONTRAST (1-10):
-# - Differentiates from Sportverein, VHS, commercial studios?
-# - Shows gaps they miss (through implication, not direct comparison)?
-# - Positions Joy of Movement as obvious solution?
-#
-# Return ONLY valid JSON (no markdown, no explanation):"""
+SCORER_SYSTEM = """You are a strict content evaluator for "The Joy of Movement".
 
-# SCORING_USER = """Evaluate this content:
-#
-# {content}
-#
-# Return JSON (only, no other text):
-# {{
-#   "voice_authenticity": 8,
-#   "constraint_compliance": 9,
-#   "identity_clarity": 7,
-#   "story_quality": 8,
-#   "competitor_contrast": 6,
-#   "overall_score": 7.6,
-#   "feedback": "Strong voice and identity messaging...",
-#   "issues": [
-#     {{
-#       "problem": "Uses forbidden word 'journey'",
-#       "suggestion": "Replace with 'path', 'chapter', or 'story'"
-#     }}
-#   ]
-# }}"""
+Your job: Score content on 4 dimensions (1-10 each):
+
+EMOTIONAL_TRUTH (1-10):
+- Does this persona feel REAL or manufactured?
+- Is there genuine emotional weight?
+- Would a 55-year-old in this transition recognize themselves?
+
+DIFFERENTIATION (1-10):
+- Could Sportverein, VHS, or generic fitness brand write this?
+- Is it specific to Joy of Movement?
+- Is competitor contrast evident (implicit)?
+
+BRAND_INTEGRITY (1-10):
+- Does it feel unmistakably Joy of Movement?
+- Is "movement as vehicle, belonging as product" evident?
+- Does "I am a Mover" resonate?
+
+AUTHENTICITY (1-10):
+- Any corporate speak, forbidden words, clichés?
+- Does every sentence earn its place?
+- Is the voice warm, direct, eye-level?
+
+Return ONLY valid JSON (no markdown, no explanation):"""
+
+SCORER_USER = """CONTENT:
+{content}
+
+---
+
+Evaluate and return JSON only (no other text):
+{{
+  "emotional_truth": 0,
+  "differentiation": 0,
+  "brand_integrity": 0,
+  "authenticity": 0,
+  "overall_score": 0.0,
+  "strengths": ["strength 1", "strength 2"],
+  "weaknesses": ["weakness 1", "weakness 2"]
+}}"""
 
 
 # ---------------------------------------------------------------------------
@@ -522,15 +509,28 @@ class PromptTemplates:
             topic="",
         )
 
+    def build_scorer(self, content: str) -> PromptResult:
+        """Build a scorer prompt to evaluate content quality."""
+        return PromptResult(
+            system_prompt=SCORER_SYSTEM,
+            user_prompt=SCORER_USER.format(content=content),
+            template_type="scorer",
+            content_type="score",
+            topic="",
+        )
+
     def list_templates(self) -> None:
         """Print available templates and their use cases."""
         print("\n=== AVAILABLE PROMPT TEMPLATES ===")
         print("BRAND   → Primary KB only. Brand voice, identity, rituals.")
         print("INDUSTRY → Secondary KB only. Market positioning, competitor contrast.")
         print("HYBRID  → Both KBs. Maximum differentiation. Use for demos.")
-        print("\nAGENTS:")
-        print("CRITIC  → Ruthless evaluation of generated content")
-        print("REFINER → Improve content based on critique")
+        print("\nMULTI-AGENT PIPELINE:")
+        print("CREATOR → Generate content with persona storytelling")
+        print("CRITIC  → Ruthless evaluation (identifies weaknesses)")
+        print("REFINER → Improve based on critique")
+        print("SCORER  → Measure quality (1-10 scale, JSON output)")
+        print("\nIterative Loop: Creator → Critic → Refiner → Scorer → (loop if score < 8)")
         print("\nContent types: blog_post | social_media | newsletter")
 
 
