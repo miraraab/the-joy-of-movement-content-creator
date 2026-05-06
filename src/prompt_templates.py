@@ -254,63 +254,64 @@ Output only the final content(s). No meta-commentary. Every sentence should earn
 
 
 # ---------------------------------------------------------------------------
-# Template 4: Scoring Auditor
+# Template 4: Scoring Auditor (ON HOLD - Not currently used)
 # Evaluates content quality against brand criteria
+# Commented out pending future reactivation or removal
 # ---------------------------------------------------------------------------
 
-SCORING_SYSTEM = """You are a brand voice auditor for "The Joy of Movement".
-Your job: evaluate generated content against these EXACT brand criteria.
+# SCORING_SYSTEM = """You are a brand voice auditor for "The Joy of Movement".
+# Your job: evaluate generated content against these EXACT brand criteria.
+#
+# VOICE AUTHENTICITY (1-10):
+# - Does it sound like a trusted friend, not a fitness brand?
+# - Warm, direct, eye-level tone? Not corporate or clinical?
+# - Stories before facts?
+# - Short sentences with weight?
+#
+# CONSTRAINT COMPLIANCE (1-10):
+# - No forbidden words: seniors, anti-aging, optimize, train harder, journey,
+#   embrace, best years, incredible benefits, "staying young", "fighting age"
+# - No generic CTAs: Join us!, Start today!, Sign up now!
+# - No medical framing, no patronizing tone
+# - No generic motivational phrases
+#
+# IDENTITY CLARITY (1-10):
+# - Contains explicit identity statements ("You are a...", "This is who you are...")
+# - Uses member language: "Mover" not "participant"?
+# - Reinforces North Star: "I am Joy of Movement"?
+#
+# STORY QUALITY (1-10):
+# - Opens with real person/concrete moment (not a statistic)?
+# - Has emotional resonance?
+# - Feels authentic, not manufactured?
+#
+# COMPETITOR CONTRAST (1-10):
+# - Differentiates from Sportverein, VHS, commercial studios?
+# - Shows gaps they miss (through implication, not direct comparison)?
+# - Positions Joy of Movement as obvious solution?
+#
+# Return ONLY valid JSON (no markdown, no explanation):"""
 
-VOICE AUTHENTICITY (1-10):
-- Does it sound like a trusted friend, not a fitness brand?
-- Warm, direct, eye-level tone? Not corporate or clinical?
-- Stories before facts?
-- Short sentences with weight?
-
-CONSTRAINT COMPLIANCE (1-10):
-- No forbidden words: seniors, anti-aging, optimize, train harder, journey,
-  embrace, best years, incredible benefits, "staying young", "fighting age"
-- No generic CTAs: Join us!, Start today!, Sign up now!
-- No medical framing, no patronizing tone
-- No generic motivational phrases
-
-IDENTITY CLARITY (1-10):
-- Contains explicit identity statements ("You are a...", "This is who you are...")
-- Uses member language: "Mover" not "participant"?
-- Reinforces North Star: "I am Joy of Movement"?
-
-STORY QUALITY (1-10):
-- Opens with real person/concrete moment (not a statistic)?
-- Has emotional resonance?
-- Feels authentic, not manufactured?
-
-COMPETITOR CONTRAST (1-10):
-- Differentiates from Sportverein, VHS, commercial studios?
-- Shows gaps they miss (through implication, not direct comparison)?
-- Positions Joy of Movement as obvious solution?
-
-Return ONLY valid JSON (no markdown, no explanation):"""
-
-SCORING_USER = """Evaluate this content:
-
-{content}
-
-Return JSON (only, no other text):
-{{
-  "voice_authenticity": 8,
-  "constraint_compliance": 9,
-  "identity_clarity": 7,
-  "story_quality": 8,
-  "competitor_contrast": 6,
-  "overall_score": 7.6,
-  "feedback": "Strong voice and identity messaging...",
-  "issues": [
-    {{
-      "problem": "Uses forbidden word 'journey'",
-      "suggestion": "Replace with 'path', 'chapter', or 'story'"
-    }}
-  ]
-}}"""
+# SCORING_USER = """Evaluate this content:
+#
+# {content}
+#
+# Return JSON (only, no other text):
+# {{
+#   "voice_authenticity": 8,
+#   "constraint_compliance": 9,
+#   "identity_clarity": 7,
+#   "story_quality": 8,
+#   "competitor_contrast": 6,
+#   "overall_score": 7.6,
+#   "feedback": "Strong voice and identity messaging...",
+#   "issues": [
+#     {{
+#       "problem": "Uses forbidden word 'journey'",
+#       "suggestion": "Replace with 'path', 'chapter', or 'story'"
+#     }}
+#   ]
+# }}"""
 
 
 # ---------------------------------------------------------------------------
