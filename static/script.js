@@ -118,12 +118,63 @@ async function publishContent() {
         document.getElementById('content-chars').textContent =
             data.char_count.toLocaleString();
 
+        // Display score if available
+        if (data.score) {
+            displayCreateScore(data.score);
+        }
+
         loading.classList.add('hidden');
         contentDisplay.classList.remove('hidden');
 
     } catch (error) {
         console.error('Error:', error);
         loading.innerHTML = '<p style="color: red;">Error generating content. Please try again.</p>';
+    }
+}
+
+// Display score in Step 3 (Create)
+function displayCreateScore(score) {
+    const scorePanel = document.getElementById('create-score-panel');
+    const statusEl = document.getElementById('create-score-status');
+
+    // Show the score panel
+    scorePanel.classList.remove('hidden');
+
+    // Update individual metrics (scale: 1-10 → 10-100%)
+    document.getElementById('create-score-emotional-fill').style.width = (score.emotional_truth * 10) + '%';
+    document.getElementById('create-score-emotional-value').textContent = score.emotional_truth.toFixed(1);
+
+    document.getElementById('create-score-diff-fill').style.width = (score.differentiation * 10) + '%';
+    document.getElementById('create-score-diff-value').textContent = score.differentiation.toFixed(1);
+
+    document.getElementById('create-score-brand-fill').style.width = (score.brand_integrity * 10) + '%';
+    document.getElementById('create-score-brand-value').textContent = score.brand_integrity.toFixed(1);
+
+    document.getElementById('create-score-auth-fill').style.width = (score.authenticity * 10) + '%';
+    document.getElementById('create-score-auth-value').textContent = score.authenticity.toFixed(1);
+
+    // Update overall score
+    document.getElementById('create-score-overall').textContent = score.overall_score.toFixed(1) + '/10';
+
+    // Threshold logic: 8/10
+    if (score.overall_score < 8) {
+        scorePanel.classList.add('score-below-threshold');
+        scorePanel.classList.remove('score-good');
+        statusEl.innerHTML = '<strong style="color: #d9534f;">Score below 8/10 — Refine to improve</strong>';
+    } else {
+        scorePanel.classList.add('score-good');
+        scorePanel.classList.remove('score-below-threshold');
+        statusEl.innerHTML = '<strong style="color: var(--success);">Score ≥ 8/10 — Ready to refine or save</strong>';
+    }
+
+    // Display strengths
+    if (score.strengths && score.strengths.length > 0) {
+        document.getElementById('create-score-strengths').textContent = score.strengths.join(' • ');
+    }
+
+    // Display weaknesses
+    if (score.weaknesses && score.weaknesses.length > 0) {
+        document.getElementById('create-score-weaknesses').textContent = score.weaknesses.join(' • ');
     }
 }
 

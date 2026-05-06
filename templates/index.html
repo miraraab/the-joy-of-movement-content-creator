@@ -178,6 +178,50 @@
                             <!-- Generated content will appear here -->
                         </div>
 
+                        <!-- Quality Score Panel (Step 3) -->
+                        <div id="create-score-panel" class="score-panel hidden">
+                            <h3>Content Quality Score</h3>
+
+                            <div class="score-grid">
+                                <div class="score-item">
+                                    <span class="label">Emotional Truth</span>
+                                    <div class="score-bar"><div class="fill" id="create-score-emotional-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="create-score-emotional-value">—</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="label">Differentiation</span>
+                                    <div class="score-bar"><div class="fill" id="create-score-diff-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="create-score-diff-value">—</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="label">Brand Integrity</span>
+                                    <div class="score-bar"><div class="fill" id="create-score-brand-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="create-score-brand-value">—</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="label">Authenticity</span>
+                                    <div class="score-bar"><div class="fill" id="create-score-auth-fill" style="width: 0%"></div></div>
+                                    <span class="value" id="create-score-auth-value">—</span>
+                                </div>
+                            </div>
+
+                            <div class="overall-score">
+                                Overall: <strong id="create-score-overall">—</strong>
+                            </div>
+
+                            <div id="create-score-status"></div>
+
+                            <div class="feedback-box">
+                                <strong>Strengths:</strong>
+                                <p id="create-score-strengths"></p>
+                            </div>
+
+                            <div class="feedback-box">
+                                <strong>Areas to improve:</strong>
+                                <p id="create-score-weaknesses"></p>
+                            </div>
+                        </div>
+
                         <div class="form-actions">
                             <button class="btn btn-secondary" onclick="goToStep(4)">
                                 Next: Refine
