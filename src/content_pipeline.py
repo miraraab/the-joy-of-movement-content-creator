@@ -305,6 +305,13 @@ class ContentPipeline:
         prompt = self.templates.build_scorer(content=output.generated_text)
         score_json_str = self.llm.generate(prompt)
 
+        # Strip markdown code blocks if present (LLM sometimes wraps JSON in ```json...```)
+        if score_json_str.startswith('```'):
+            score_json_str = score_json_str.split('```')[1]
+            if score_json_str.startswith('json'):
+                score_json_str = score_json_str[4:]
+            score_json_str = score_json_str.strip()
+
         try:
             score_data = json.loads(score_json_str)
 
